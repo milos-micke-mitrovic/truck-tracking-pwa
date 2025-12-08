@@ -15,36 +15,39 @@ export function RoutingControl({ origin, destination, onRouteReady }: RoutingCon
   const map = useMap();
   const routingControlRef = useRef<L.Routing.Control | null>(null);
   const isMounted = useRef(false);
-  const isInitializing = useRef(false);
   const hasFittedRef = useRef(false);
-  const lastDestinationRef = useRef<string | null>(null);
+  const originRef = useRef(origin);
+  const onRouteReadyRef = useRef(onRouteReady);
 
+  // Keep refs updated
+  originRef.current = origin;
+  onRouteReadyRef.current = onRouteReady;
+
+  // Initialize routing control when destination changes
   useEffect(() => {
-    const destKey = destination ? `${destination[0]},${destination[1]}` : null;
-
     isMounted.current = true;
+    hasFittedRef.current = false;
 
-    if (!map || !origin || !destination) return;
-
-    // Reset hasFitted only if destination actually changed
-    if (destKey !== lastDestinationRef.current) {
-      hasFittedRef.current = false;
-      lastDestinationRef.current = destKey;
-    }
-
-    // Prevent double initialization
-    if (isInitializing.current || routingControlRef.current) return;
-
-    isInitializing.current = true;
+    if (!map || !destination) return;
 
     const timeoutId = setTimeout(() => {
-      if (!isMounted.current) {
-        isInitializing.current = false;
-        return;
+      if (!isMounted.current) return;
+
+      // Clean up existing control
+      if (routingControlRef.current) {
+        try {
+          map.removeControl(routingControlRef.current);
+        } catch {
+          // Ignore
+        }
+        routingControlRef.current = null;
       }
 
       const routingControl = L.Routing.control({
-        waypoints: [L.latLng(origin[0], origin[1]), L.latLng(destination[0], destination[1])],
+        waypoints: [
+          L.latLng(originRef.current[0], originRef.current[1]),
+          L.latLng(destination[0], destination[1]),
+        ],
         routeWhileDragging: false,
         showAlternatives: false,
         fitSelectedRoutes: false,
@@ -66,7 +69,7 @@ export function RoutingControl({ origin, destination, onRouteReady }: RoutingCon
             hasFittedRef.current = true;
             const bounds = L.latLngBounds(coords);
             map.fitBounds(bounds, { padding: FIT_BOUNDS_PADDING });
-            onRouteReady?.();
+            onRouteReadyRef.current?.();
           }
         }
       });
@@ -75,7 +78,7 @@ export function RoutingControl({ origin, destination, onRouteReady }: RoutingCon
         routingControl.addTo(map);
         routingControlRef.current = routingControl;
 
-        // Hide the routing container (instructions panel)
+        // Hide the routing container
         const container = document.querySelector('.leaflet-routing-container');
         if (container) {
           (container as HTMLElement).style.display = 'none';
@@ -85,25 +88,23 @@ export function RoutingControl({ origin, destination, onRouteReady }: RoutingCon
 
     return () => {
       isMounted.current = false;
-      isInitializing.current = false;
       clearTimeout(timeoutId);
 
       const control = routingControlRef.current;
       if (control) {
         routingControlRef.current = null;
-        // Delay removal to let any pending callbacks complete
         setTimeout(() => {
           try {
             if (map && control) {
               map.removeControl(control);
             }
           } catch {
-            // Ignore - map or control might be destroyed
+            // Ignore
           }
         }, 0);
       }
     };
-  }, [map, origin, destination, onRouteReady]);
+  }, [map, destination]);
 
   return null;
 }
