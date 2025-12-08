@@ -22,7 +22,8 @@ setupIonicReact({
 });
 
 async function enableMocking(): Promise<void> {
-  if (import.meta.env.DEV) {
+  // Enable MSW in dev or when VITE_ENABLE_MSW is true
+  if (import.meta.env.DEV || import.meta.env.VITE_ENABLE_MSW === 'true') {
     const { worker } = await import('@/mocks/browser');
     await worker.start({
       onUnhandledRequest: 'bypass',
