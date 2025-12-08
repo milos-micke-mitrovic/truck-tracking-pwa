@@ -1,0 +1,16 @@
+export {
+  Heading,
+  Text,
+  Label,
+  Caption,
+  Overline,
+  TextLink,
+  InlineCode,
+  type HeadingProps,
+  type TextProps,
+  type LabelProps,
+  type CaptionProps,
+  type OverlineProps,
+  type TextLinkProps,
+  type InlineCodeProps,
+} from './Typography';

@@ -1,0 +1,25 @@
+/* ================================
+   Global Styles Entry Point
+   ================================
+
+   This file imports all style partials in the correct order.
+   Do not add styles directly to this file.
+   ================================ */
+
+/* 1. Variables - Design tokens (must be first) */
+@import './_variables.css';
+
+/* 2. Reset - CSS reset/normalize */
+@import './_reset.css';
+
+/* 3. Typography - Font styles and text utilities */
+@import './_typography.css';
+
+/* 4. Utilities - Utility classes */
+@import './_utilities.css';
+
+/* 5. Animations - Keyframes and animation utilities */
+@import './_animations.css';
+
+/* 6. Components - Component-specific styles (must be last) */
+@import './_components.css';

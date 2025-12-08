@@ -1,0 +1,479 @@
+/* ================================
+   CSS Variables - Design Tokens
+   ================================
+
+   All design tokens for the Truck Drive app.
+   Use these variables throughout the app for consistency.
+   ================================ */
+
+/* Import Inter font from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  /* ================================
+     Colors - Primary Palette (Purple)
+     ================================ */
+  --color-primary: #7c3aed;
+  --color-primary-rgb: 124, 58, 237;
+  --color-primary-light: #8b5cf6;
+  --color-primary-lighter: #a78bfa;
+  --color-primary-dark: #6d28d9;
+  --color-primary-darker: #5b21b6;
+  --color-primary-contrast: #ffffff;
+
+  /* Ionic Color Overrides */
+  --ion-color-primary: #7c3aed;
+  --ion-color-primary-rgb: 124, 58, 237;
+  --ion-color-primary-contrast: #ffffff;
+  --ion-color-primary-contrast-rgb: 255, 255, 255;
+  --ion-color-primary-shade: #6d28d9;
+  --ion-color-primary-tint: #8b5cf6;
+
+  /* Ionic Font Override */
+  --ion-font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+
+  /* ================================
+     Colors - Secondary Palette
+     ================================ */
+  --color-secondary: #3dc2ff;
+  --color-secondary-rgb: 61, 194, 255;
+  --color-secondary-light: #6dd1ff;
+  --color-secondary-dark: #2e9acc;
+  --color-secondary-contrast: #000000;
+
+  /* ================================
+     Colors - Semantic Colors
+     ================================ */
+  --color-success: #2dd36f;
+  --color-success-rgb: 45, 211, 111;
+  --color-success-light: #5ae088;
+  --color-success-dark: #24a859;
+  --color-success-contrast: #ffffff;
+
+  --color-warning: #ffc409;
+  --color-warning-rgb: 255, 196, 9;
+  --color-warning-light: #ffd33d;
+  --color-warning-dark: #cc9c07;
+  --color-warning-contrast: #000000;
+
+  --color-danger: #eb445a;
+  --color-danger-rgb: 235, 68, 90;
+  --color-danger-light: #ef6d7d;
+  --color-danger-dark: #bc3648;
+  --color-danger-contrast: #ffffff;
+
+  --color-info: #5260ff;
+  --color-info-rgb: 82, 96, 255;
+  --color-info-light: #7580ff;
+  --color-info-dark: #424dcc;
+  --color-info-contrast: #ffffff;
+
+  /* ================================
+     Colors - Neutral Palette
+     ================================ */
+  --color-dark: #222428;
+  --color-dark-rgb: 34, 36, 40;
+  --color-dark-light: #383a3e;
+  --color-dark-contrast: #ffffff;
+
+  --color-medium: #92949c;
+  --color-medium-rgb: 146, 148, 156;
+  --color-medium-light: #a8aab0;
+  --color-medium-dark: #74767d;
+  --color-medium-contrast: #ffffff;
+
+  --color-light: #f4f5f8;
+  --color-light-rgb: 244, 245, 248;
+  --color-light-dark: #e0e1e4;
+  --color-light-contrast: #000000;
+
+  /* ================================
+     Colors - Background
+     ================================ */
+  --color-background: #ffffff;
+  --color-background-rgb: 255, 255, 255;
+  --color-background-secondary: #f4f5f8;
+  --color-background-tertiary: #e8eaed;
+
+  /* ================================
+     Colors - Text
+     ================================ */
+  --color-text-primary: #222428;
+  --color-text-secondary: #5f6368;
+  --color-text-tertiary: #92949c;
+  --color-text-disabled: #bdbdbd;
+  --color-text-inverse: #ffffff;
+  --color-text-link: #7c3aed;
+
+  /* ================================
+     Colors - Border
+     ================================ */
+  --color-border: #e0e0e0;
+  --color-border-light: #f0f0f0;
+  --color-border-dark: #c0c0c0;
+  --color-border-focus: #7c3aed;
+
+  /* ================================
+     Colors - Overlay
+     ================================ */
+  --color-overlay: rgba(0, 0, 0, 0.5);
+  --color-overlay-light: rgba(0, 0, 0, 0.3);
+  --color-overlay-dark: rgba(0, 0, 0, 0.7);
+
+  /* ================================
+     Spacing Scale
+     ================================ */
+  --spacing-0: 0;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-7: 28px;
+  --spacing-8: 32px;
+  --spacing-10: 40px;
+  --spacing-12: 48px;
+  --spacing-16: 64px;
+  --spacing-20: 80px;
+  --spacing-24: 96px;
+
+  /* Semantic spacing aliases */
+  --spacing-xs: var(--spacing-1);
+  --spacing-sm: var(--spacing-2);
+  --spacing-md: var(--spacing-4);
+  --spacing-lg: var(--spacing-6);
+  --spacing-xl: var(--spacing-8);
+  --spacing-2xl: var(--spacing-12);
+  --spacing-3xl: var(--spacing-16);
+
+  /* ================================
+     Typography - Font Family
+     ================================ */
+  --font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    Oxygen, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  --font-family-mono: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', 'Droid Sans Mono',
+    'Source Code Pro', monospace;
+
+  /* ================================
+     Typography - Font Sizes
+     ================================ */
+  --font-size-xs: 10px;
+  --font-size-sm: 12px;
+  --font-size-base: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 28px;
+  --font-size-4xl: 32px;
+  --font-size-5xl: 40px;
+
+  /* ================================
+     Typography - Font Weights
+     ================================ */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-extrabold: 800;
+
+  /* ================================
+     Typography - Line Heights
+     ================================ */
+  --line-height-none: 1;
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* ================================
+     Typography - Letter Spacing
+     ================================ */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+
+  /* ================================
+     Border Radius
+     ================================ */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+
+  /* ================================
+     Shadows
+     ================================ */
+  --shadow-none: none;
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.25);
+  --shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+
+  /* Focus shadow */
+  --shadow-focus: 0 0 0 3px rgba(56, 128, 255, 0.4);
+  --shadow-focus-danger: 0 0 0 3px rgba(235, 68, 90, 0.4);
+
+  /* ================================
+     Z-Index Scale
+     ================================ */
+  --z-index-hide: -1;
+  --z-index-base: 0;
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-fixed: 300;
+  --z-index-drawer: 400;
+  --z-index-modal-backdrop: 500;
+  --z-index-modal: 600;
+  --z-index-popover: 700;
+  --z-index-tooltip: 800;
+  --z-index-toast: 900;
+  --z-index-loading: 1000;
+  --z-index-max: 9999;
+
+  /* ================================
+     Transitions
+     ================================ */
+  --transition-duration-fast: 150ms;
+  --transition-duration-normal: 250ms;
+  --transition-duration-slow: 350ms;
+  --transition-duration-slower: 500ms;
+
+  --transition-timing-ease: ease;
+  --transition-timing-ease-in: ease-in;
+  --transition-timing-ease-out: ease-out;
+  --transition-timing-ease-in-out: ease-in-out;
+  --transition-timing-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+  /* Common transitions */
+  --transition-fast: all var(--transition-duration-fast) var(--transition-timing-ease-out);
+  --transition-normal: all var(--transition-duration-normal) var(--transition-timing-ease-out);
+  --transition-slow: all var(--transition-duration-slow) var(--transition-timing-ease-out);
+
+  /* ================================
+     Breakpoints (for reference)
+     ================================ */
+  --breakpoint-xs: 0;
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+
+  /* ================================
+     Safe Areas (for mobile notch/gestures)
+     ================================ */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+
+  /* ================================
+     Component-specific Variables
+     ================================ */
+
+  /* Header */
+  --header-height: 56px;
+  --header-background: var(--color-background);
+  --header-border-color: var(--color-border);
+
+  /* Tab Bar */
+  --tab-bar-height: 56px;
+  --tab-bar-background: var(--color-background);
+
+  /* Drawer/Menu */
+  --drawer-width: 280px;
+  --drawer-background: var(--color-background);
+
+  /* Card */
+  --card-background: var(--color-background);
+  --card-border-radius: var(--radius-lg);
+  --card-shadow: var(--shadow-sm);
+  --card-padding: var(--spacing-md);
+
+  /* Button */
+  --button-height-sm: 32px;
+  --button-height-md: 40px;
+  --button-height-lg: 48px;
+  --button-border-radius: var(--radius-md);
+
+  /* Input */
+  --input-height: 48px;
+  --input-border-radius: var(--radius-md);
+  --input-background: var(--color-background);
+  --input-border-color: var(--color-border);
+
+  /* Avatar */
+  --avatar-size-xs: 24px;
+  --avatar-size-sm: 32px;
+  --avatar-size-md: 40px;
+  --avatar-size-lg: 56px;
+  --avatar-size-xl: 72px;
+
+  /* Badge */
+  --badge-height: 20px;
+  --badge-font-size: var(--font-size-xs);
+
+  /* Toast */
+  --toast-background: var(--color-dark);
+  --toast-color: var(--color-text-inverse);
+  --toast-border-radius: var(--radius-md);
+
+  /* Modal */
+  --modal-background: var(--color-background);
+  --modal-border-radius: var(--radius-xl);
+  --modal-shadow: var(--shadow-xl);
+
+  /* Spinner */
+  --spinner-size-sm: 16px;
+  --spinner-size-md: 24px;
+  --spinner-size-lg: 40px;
+}
+
+/* ================================
+   Dark Mode
+   ================================ */
+.dark {
+  /* Background */
+  --color-background: #1a1a1a;
+  --color-background-rgb: 26, 26, 26;
+  --color-background-secondary: #242424;
+  --color-background-tertiary: #2e2e2e;
+
+  /* Text */
+  --color-text-primary: #f3f4f6;
+  --color-text-secondary: #9ca3af;
+  --color-text-tertiary: #6b7280;
+  --color-text-disabled: #4b5563;
+  --color-text-inverse: #1a1a1a;
+
+  /* Border */
+  --color-border: #374151;
+  --color-border-light: #2e2e2e;
+  --color-border-dark: #4b5563;
+
+  /* Neutral palette */
+  --color-light: #2e2e2e;
+  --color-light-rgb: 46, 46, 46;
+  --color-light-dark: #242424;
+  --color-light-contrast: #f3f4f6;
+
+  --color-dark: #f3f4f6;
+  --color-dark-rgb: 243, 244, 246;
+  --color-dark-light: #e5e7eb;
+  --color-dark-contrast: #1a1a1a;
+
+  /* Overlay */
+  --color-overlay: rgba(0, 0, 0, 0.7);
+  --color-overlay-light: rgba(0, 0, 0, 0.5);
+  --color-overlay-dark: rgba(0, 0, 0, 0.85);
+
+  /* Shadows - lighter for dark mode */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.4), 0 10px 10px rgba(0, 0, 0, 0.3);
+  --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.5);
+
+  /* Component-specific */
+  --header-background: var(--color-background);
+  --tab-bar-background: var(--color-background);
+  --drawer-background: var(--color-background);
+  --card-background: var(--color-background-secondary);
+  --input-background: var(--color-background);
+  --toast-background: #374151;
+  --toast-color: #f3f4f6;
+  --modal-background: var(--color-background-secondary);
+
+  /* Ionic overrides for dark mode */
+  --ion-background-color: var(--color-background);
+  --ion-background-color-rgb: 26, 26, 26;
+  --ion-text-color: var(--color-text-primary);
+  --ion-text-color-rgb: 243, 244, 246;
+  --ion-border-color: var(--color-border);
+  --ion-toolbar-background: var(--color-background);
+  --ion-tab-bar-background: var(--color-background);
+  --ion-card-background: var(--color-background-secondary);
+  --ion-item-background: var(--color-background);
+}
+
+/* Auto dark mode based on system preference */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    /* Background */
+    --color-background: #1a1a1a;
+    --color-background-rgb: 26, 26, 26;
+    --color-background-secondary: #242424;
+    --color-background-tertiary: #2e2e2e;
+
+    /* Text */
+    --color-text-primary: #f3f4f6;
+    --color-text-secondary: #9ca3af;
+    --color-text-tertiary: #6b7280;
+    --color-text-disabled: #4b5563;
+    --color-text-inverse: #1a1a1a;
+
+    /* Border */
+    --color-border: #374151;
+    --color-border-light: #2e2e2e;
+    --color-border-dark: #4b5563;
+
+    /* Neutral palette */
+    --color-light: #2e2e2e;
+    --color-light-rgb: 46, 46, 46;
+    --color-light-dark: #242424;
+    --color-light-contrast: #f3f4f6;
+
+    --color-dark: #f3f4f6;
+    --color-dark-rgb: 243, 244, 246;
+    --color-dark-light: #e5e7eb;
+    --color-dark-contrast: #1a1a1a;
+
+    /* Overlay */
+    --color-overlay: rgba(0, 0, 0, 0.7);
+    --color-overlay-light: rgba(0, 0, 0, 0.5);
+    --color-overlay-dark: rgba(0, 0, 0, 0.85);
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4), 0 4px 6px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.4), 0 10px 10px rgba(0, 0, 0, 0.3);
+    --shadow-2xl: 0 25px 50px rgba(0, 0, 0, 0.5);
+
+    /* Component-specific */
+    --header-background: var(--color-background);
+    --tab-bar-background: var(--color-background);
+    --drawer-background: var(--color-background);
+    --card-background: var(--color-background-secondary);
+    --input-background: var(--color-background);
+    --toast-background: #374151;
+    --toast-color: #f3f4f6;
+    --modal-background: var(--color-background-secondary);
+
+    /* Ionic overrides */
+    --ion-background-color: var(--color-background);
+    --ion-background-color-rgb: 26, 26, 26;
+    --ion-text-color: var(--color-text-primary);
+    --ion-text-color-rgb: 243, 244, 246;
+    --ion-border-color: var(--color-border);
+    --ion-toolbar-background: var(--color-background);
+    --ion-tab-bar-background: var(--color-background);
+    --ion-card-background: var(--color-background-secondary);
+    --ion-item-background: var(--color-background);
+  }
+}
