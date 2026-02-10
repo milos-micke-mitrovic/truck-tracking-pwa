@@ -23,6 +23,9 @@ export function RoutingControl({ origin, destination, onRouteReady }: RoutingCon
   originRef.current = origin;
   onRouteReadyRef.current = onRouteReady;
 
+  // Create stable destination key
+  const destKey = `${destination[0]},${destination[1]}`;
+
   // Initialize routing control when destination changes
   useEffect(() => {
     isMounted.current = true;
@@ -104,7 +107,8 @@ export function RoutingControl({ origin, destination, onRouteReady }: RoutingCon
         }, 0);
       }
     };
-  }, [map, destination]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [map, destKey]);
 
   return null;
 }
