@@ -22,12 +22,16 @@ setupIonicReact({
 });
 
 async function enableMocking(): Promise<void> {
-  // Enable MSW in dev or when VITE_ENABLE_MSW is true
-  if (import.meta.env.DEV || import.meta.env.VITE_ENABLE_MSW === 'true') {
+  // Enable MSW only when explicitly enabled
+  if (import.meta.env.VITE_ENABLE_MSW === 'true') {
     const { worker } = await import('@/mocks/browser');
     await worker.start({
       onUnhandledRequest: 'bypass',
     });
+
+    // Setup SSE mock for console testing
+    const { setupSSEMock } = await import('@/mocks/sse-mock');
+    setupSSEMock();
   }
 }
 

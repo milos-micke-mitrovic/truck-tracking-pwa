@@ -1,7 +1,9 @@
 import { useState, useCallback } from 'react';
 import { useAuthStore } from '@/shared/stores';
 import { apiClient } from '@/shared/api';
-import type { LoginCredentials, LoginResponse, AuthError } from '../types/auth.types';
+import { decodeJwtPayload } from '@/shared/utils';
+import { registerPushNotifications } from '@/shared/services/push.service';
+import type { LoginCredentials, AuthResponse, AuthError } from '../types/auth.types';
 
 interface UseLoginReturn {
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -25,17 +27,24 @@ export function useLogin(): UseLoginReturn {
       setError(null);
 
       try {
-        const data = await apiClient.post<LoginResponse>('/auth/login', {
+        const data = await apiClient.post<AuthResponse>('/auth/login', {
           body: credentials,
         });
 
-        if (!data.success) {
-          throw new Error(data.message || 'Login failed');
-        }
+        const payload = decodeJwtPayload(data.accessToken);
 
-        if (data.data) {
-          setAuth(data.data.user, data.data.token);
-        }
+        const user = {
+          id: payload.sub,
+          email: payload.email,
+          name: `${payload.first_name} ${payload.last_name}`,
+          driverId: payload.sub,
+          tenantId: payload.tenant_id,
+        };
+
+        setAuth(user, data.accessToken, data.refreshToken, data.expiresIn);
+
+        // Register push notifications (non-blocking)
+        void registerPushNotifications(user.driverId);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'An unexpected error occurred';
         setError({ message });

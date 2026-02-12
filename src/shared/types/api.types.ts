@@ -11,9 +11,12 @@ export interface ApiError {
 }
 
 export interface PaginatedResponse<T> {
-  data: T[];
-  page: number;
-  pageSize: number;
-  total: number;
+  content: T[];
+  number: number;
+  size: number;
+  totalElements: number;
   totalPages: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
 }

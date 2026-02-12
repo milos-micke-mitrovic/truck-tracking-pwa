@@ -1,19 +1,17 @@
 import { PageLayout } from '@/shared/components';
-import { WelcomeCard, QuickStats, ActiveDelivery, QuickActions } from '../components';
+import { WelcomeCard, QuickStats, ActiveDelivery } from '../components';
+import { useRoutes } from '@/features/routes/hooks/use-routes';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 
 export function HomePage() {
-  const handleRefresh = async () => {
-    // Simulate refresh - will be replaced with real data fetch
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  };
+  const { refresh } = useRoutes();
 
   return (
-    <PageLayout title="Home" onRefresh={handleRefresh}>
+    <PageLayout title="Home" headerRightContent={<NotificationBell />} onRefresh={refresh}>
       <div className="home-page">
         <WelcomeCard />
         <QuickStats />
         <ActiveDelivery />
-        <QuickActions />
       </div>
     </PageLayout>
   );

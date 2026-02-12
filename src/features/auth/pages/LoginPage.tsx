@@ -25,15 +25,6 @@ export function LoginPage() {
               <LoginForm />
             </div>
 
-            <div className="login-page__footer">
-              <Text size="sm" color="tertiary" align="center" className="login-page__hint">
-                Demo credentials:
-                <br />
-                Username: driver
-                <br />
-                Password: password123
-              </Text>
-            </div>
           </div>
         </IonContent>
       </IonPage>

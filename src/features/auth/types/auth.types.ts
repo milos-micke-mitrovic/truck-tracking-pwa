@@ -1,17 +1,13 @@
-import type { User } from '@/shared/stores';
-
 export interface LoginCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
-export interface LoginResponse {
-  success: boolean;
-  data?: {
-    user: User;
-    token: string;
-  };
-  message?: string;
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
+  tokenType: string;
+  expiresIn: number;
 }
 
 export interface AuthError {

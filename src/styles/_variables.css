@@ -6,9 +6,6 @@
    Use these variables throughout the app for consistency.
    ================================ */
 
-/* Import Inter font from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
 :root {
   /* ================================
      Colors - Primary Palette (Purple)
@@ -157,18 +154,18 @@
     'Source Code Pro', monospace;
 
   /* ================================
-     Typography - Font Sizes
+     Typography - Font Sizes (mobile-first)
      ================================ */
-  --font-size-xs: 10px;
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
-  --font-size-md: 16px;
-  --font-size-lg: 18px;
-  --font-size-xl: 20px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 28px;
-  --font-size-4xl: 32px;
-  --font-size-5xl: 40px;
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-md: 18px;
+  --font-size-lg: 20px;
+  --font-size-xl: 22px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+  --font-size-5xl: 44px;
 
   /* ================================
      Typography - Font Weights
@@ -304,9 +301,9 @@
   --card-padding: var(--spacing-md);
 
   /* Button */
-  --button-height-sm: 32px;
-  --button-height-md: 40px;
-  --button-height-lg: 48px;
+  --button-height-sm: 36px;
+  --button-height-md: 44px;
+  --button-height-lg: 52px;
   --button-border-radius: var(--radius-md);
 
   /* Input */
@@ -323,7 +320,7 @@
   --avatar-size-xl: 72px;
 
   /* Badge */
-  --badge-height: 20px;
+  --badge-height: 24px;
   --badge-font-size: var(--font-size-xs);
 
   /* Toast */

@@ -26,9 +26,10 @@ ion-page {
 ion-tab-bar {
   --background: var(--color-background);
   --border: none;
-  height: calc(var(--tab-bar-height) + var(--spacing-2));
-  border-top-left-radius: var(--radius-2xl);
-  border-top-right-radius: var(--radius-2xl);
+  height: calc(var(--tab-bar-height) + var(--spacing-2) + var(--safe-area-bottom));
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
+  border-bottom-left-radius: 0 !important;
+  border-bottom-right-radius: 0 !important;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
   padding-bottom: var(--safe-area-bottom);
   position: relative;
@@ -39,17 +40,25 @@ ion-tab-button {
   --color-selected: var(--color-primary);
   --padding-top: var(--spacing-3);
   --padding-bottom: var(--spacing-2);
+  flex: 1 1 0% !important;
+  max-width: none !important;
 }
 
-/* Center tab button placeholder (spacer) */
+/* Invisible spacers for even distribution */
 ion-tab-button.tab-button-spacer {
-  flex: 1.5;
+  flex: 1 1 0% !important;
+  max-width: none !important;
   pointer-events: none;
+  opacity: 0;
+}
+
+/* FAB spacer slightly wider to fit the button + touch area */
+ion-tab-button.tab-button-spacer--fab {
+  flex: 1.3 1 0% !important;
 }
 
 /* Tab Bar Center FAB - using Ionic's IonFab */
 .tab-bar-fab {
-  /* Override Ionic's default bottom positioning */
   bottom: calc(var(--tab-bar-height) + var(--safe-area-bottom) - 40px) !important;
 }
 
@@ -80,6 +89,7 @@ ion-toolbar {
   --background: var(--color-background);
   --border-width: 0;
   --min-height: var(--header-height);
+  --padding-top: var(--spacing-2);
   --padding-bottom: var(--spacing-2);
 }
 
@@ -92,6 +102,35 @@ ion-toolbar {
 
 ion-title {
   font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  padding-inline: 70px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* Segment (Tab Switcher) */
+ion-segment {
+  --background: var(--color-background);
+  border-radius: var(--radius-md);
+}
+
+ion-segment-button {
+  --color: var(--color-text-tertiary);
+  --color-checked: #ffffff;
+  --indicator-color: var(--color-primary);
+  --indicator-height: 100%;
+  --border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+  min-height: 36px;
+}
+
+/* Override global ion-label color so Ionic's --color/--color-checked work */
+ion-segment-button ion-label {
+  color: inherit !important;
+}
+
+ion-segment-button.segment-button-checked {
   font-weight: var(--font-weight-semibold);
 }
 
@@ -171,6 +210,12 @@ ion-button[size="large"] {
   --padding-start: var(--spacing-6);
   --padding-end: var(--spacing-6);
   height: var(--button-height-lg);
+}
+
+.button__content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-2);
 }
 
 .button__icon {
@@ -362,7 +407,31 @@ ion-loading {
 
 /* Action Sheet */
 ion-action-sheet {
-  --background: var(--color-background);
+  --background: var(--color-background-secondary);
+  --button-background: var(--color-background-secondary);
+  --button-color: var(--color-primary);
+  --color: var(--color-text-primary);
+}
+
+ion-action-sheet .action-sheet-group {
+  background: var(--color-background-secondary) !important;
+}
+
+ion-action-sheet .action-sheet-title {
+  color: var(--color-text-secondary) !important;
+}
+
+ion-action-sheet .action-sheet-button {
+  color: var(--color-primary) !important;
+  background: var(--color-background-secondary) !important;
+}
+
+ion-action-sheet .action-sheet-destructive {
+  color: var(--color-danger) !important;
+}
+
+ion-action-sheet .action-sheet-cancel .action-sheet-button {
+  background: var(--color-background-secondary) !important;
 }
 
 /* Alert - uses typography classes */
@@ -576,15 +645,11 @@ ion-skeleton-text {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
-  background: var(--color-primary-lighter);
-  color: var(--color-primary);
+  width: 40px;
+  height: 40px;
+  background: var(--color-primary);
+  color: var(--color-primary-contrast);
   border-radius: var(--radius-md);
-}
-
-.dark .quick-stats__icon {
-  background: rgba(124, 58, 237, 0.2);
 }
 
 .quick-stats__info {
@@ -897,6 +962,15 @@ ion-skeleton-text {
   --background-activated: var(--color-primary-dark);
   --background-hover: var(--color-primary);
   --color: white;
+}
+
+/* Stop navigation button */
+.map-controls__button--danger {
+  --background: var(--color-danger);
+  --background-activated: var(--color-danger-dark);
+  --background-hover: var(--color-danger);
+  --color: white;
+  --box-shadow: 0 2px 8px rgba(235, 68, 90, 0.3);
 }
 
 .map-container--loading {

@@ -23,3 +23,7 @@
 
 /* 6. Components - Component-specific styles (must be last) */
 @import './_components.css';
+
+/* 7. Feature styles */
+@import '../features/routes/styles.css';
+@import '../features/notifications/styles.css';

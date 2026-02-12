@@ -1,6 +1,7 @@
 import { useAuthStore } from '@/shared/stores';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
+const TOKEN_REFRESH_THRESHOLD_MS = 60_000;
 
 export interface ApiError {
   message: string;
@@ -26,6 +27,49 @@ interface RequestOptions extends Omit<RequestInit, 'body'> {
   params?: Record<string, string | number | boolean | undefined>;
 }
 
+let refreshPromise: Promise<void> | null = null;
+
+async function ensureFreshToken(): Promise<void> {
+  const { token, refreshToken, expiresAt, setToken, logout } = useAuthStore.getState();
+  if (!token || !refreshToken || !expiresAt) return;
+
+  const timeUntilExpiry = expiresAt - Date.now();
+  if (timeUntilExpiry > TOKEN_REFRESH_THRESHOLD_MS) return;
+
+  if (refreshPromise) {
+    await refreshPromise;
+    return;
+  }
+
+  refreshPromise = (async () => {
+    try {
+      const url = buildUrl('/auth/refresh');
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ refreshToken }),
+      });
+
+      if (!response.ok) {
+        logout();
+        return;
+      }
+
+      const data = (await response.json()) as {
+        accessToken: string;
+        expiresIn: number;
+      };
+      setToken(data.accessToken, data.expiresIn);
+    } catch {
+      logout();
+    } finally {
+      refreshPromise = null;
+    }
+  })();
+
+  await refreshPromise;
+}
+
 async function handleResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     let errorMessage = 'An error occurred';
@@ -39,15 +83,22 @@ async function handleResponse<T>(response: Response): Promise<T> {
       errorMessage = response.statusText || errorMessage;
     }
 
-    // Handle 401 - Unauthorized
     if (response.status === 401) {
-      useAuthStore.getState().logout();
+      const { refreshToken } = useAuthStore.getState();
+      if (refreshToken) {
+        try {
+          await ensureFreshToken();
+        } catch {
+          useAuthStore.getState().logout();
+        }
+      } else {
+        useAuthStore.getState().logout();
+      }
     }
 
     throw new ApiClientError(errorMessage, response.status, errorCode);
   }
 
-  // Handle empty responses
   const contentType = response.headers.get('content-type');
   if (!contentType || !contentType.includes('application/json')) {
     return {} as T;
@@ -80,7 +131,6 @@ function getHeaders(customHeaders?: HeadersInit): Headers {
     headers.set('Content-Type', 'application/json');
   }
 
-  // Add auth token if available
   const token = useAuthStore.getState().token;
   if (token) {
     headers.set('Authorization', `Bearer ${token}`);
@@ -89,8 +139,18 @@ function getHeaders(customHeaders?: HeadersInit): Headers {
   return headers;
 }
 
+function getAuthHeader(): Headers {
+  const headers = new Headers();
+  const token = useAuthStore.getState().token;
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`);
+  }
+  return headers;
+}
+
 export const apiClient = {
   async get<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    await ensureFreshToken();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { params, headers, body, ...rest } = options;
     const url = buildUrl(endpoint, params);
@@ -105,6 +165,7 @@ export const apiClient = {
   },
 
   async post<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    await ensureFreshToken();
     const { body, params, headers, ...rest } = options;
     const url = buildUrl(endpoint, params);
 
@@ -118,7 +179,21 @@ export const apiClient = {
     return handleResponse<T>(response);
   },
 
+  async postFormData<T>(endpoint: string, formData: FormData): Promise<T> {
+    await ensureFreshToken();
+    const url = buildUrl(endpoint);
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: getAuthHeader(),
+      body: formData,
+    });
+
+    return handleResponse<T>(response);
+  },
+
   async put<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    await ensureFreshToken();
     const { body, params, headers, ...rest } = options;
     const url = buildUrl(endpoint, params);
 
@@ -133,6 +208,7 @@ export const apiClient = {
   },
 
   async patch<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    await ensureFreshToken();
     const { body, params, headers, ...rest } = options;
     const url = buildUrl(endpoint, params);
 
@@ -147,6 +223,7 @@ export const apiClient = {
   },
 
   async delete<T>(endpoint: string, options: RequestOptions = {}): Promise<T> {
+    await ensureFreshToken();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { params, headers, body, ...rest } = options;
     const url = buildUrl(endpoint, params);

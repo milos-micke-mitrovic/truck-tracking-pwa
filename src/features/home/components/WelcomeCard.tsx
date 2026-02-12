@@ -1,5 +1,5 @@
 import { Sun, Moon, Sunrise, Sunset } from 'lucide-react';
-import { Card, Heading, Text, StatusIndicator } from '@/shared/ui';
+import { Card, Heading, Text } from '@/shared/ui';
 import { useAuthStore } from '@/shared/stores';
 import { formatDate } from '@/shared/utils';
 
@@ -24,7 +24,6 @@ export function WelcomeCard() {
     <Card className="welcome-card">
       <div className="welcome-card__top">
         <div className="welcome-card__greeting-icon">{greeting.icon}</div>
-        <StatusIndicator status="online" label="On Duty" />
       </div>
 
       <div className="welcome-card__content">
@@ -34,9 +33,11 @@ export function WelcomeCard() {
         <Heading level={2} className="welcome-card__greeting">
           {greeting.text}, {user?.name?.split(' ')[0] || 'Driver'}
         </Heading>
-        <Text size="sm" color="tertiary" className="welcome-card__driver-id">
-          ID: {user?.driverId || 'DRV-001'}
-        </Text>
+        {user?.driverId && (
+          <Text size="sm" color="tertiary" className="welcome-card__driver-id">
+            ID: {user.driverId}
+          </Text>
+        )}
       </div>
     </Card>
   );

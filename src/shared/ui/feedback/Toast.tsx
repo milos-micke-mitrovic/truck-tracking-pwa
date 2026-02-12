@@ -1,6 +1,10 @@
 import { IonToast } from '@ionic/react';
-import { CheckCircle, AlertCircle, AlertTriangle, Info } from 'lucide-react';
-import type { ReactNode } from 'react';
+import {
+  checkmarkCircleOutline,
+  alertCircleOutline,
+  warningOutline,
+  informationCircleOutline,
+} from 'ionicons/icons';
 
 export type ToastVariant = 'success' | 'error' | 'warning' | 'info';
 
@@ -13,11 +17,11 @@ export interface ToastProps {
   onDidDismiss?: () => void;
 }
 
-const iconMap: Record<ToastVariant, ReactNode> = {
-  success: <CheckCircle size={20} />,
-  error: <AlertCircle size={20} />,
-  warning: <AlertTriangle size={20} />,
-  info: <Info size={20} />,
+const iconMap: Record<ToastVariant, string> = {
+  success: checkmarkCircleOutline,
+  error: alertCircleOutline,
+  warning: warningOutline,
+  info: informationCircleOutline,
 };
 
 const colorMap: Record<ToastVariant, string> = {
@@ -42,7 +46,7 @@ export function Toast({
       duration={duration}
       position={position}
       color={colorMap[variant]}
-      icon={iconMap[variant] as unknown as string}
+      icon={iconMap[variant]}
       onDidDismiss={onDidDismiss}
       className="toast"
     />

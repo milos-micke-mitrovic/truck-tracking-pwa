@@ -44,7 +44,7 @@ export function Button({
               {startIcon}
             </span>
           )}
-          {children}
+          <span className="button__content">{children}</span>
           {endIcon && (
             <span slot="end" className="button__icon">
               {endIcon}

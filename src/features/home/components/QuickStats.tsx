@@ -1,41 +1,41 @@
-import { Package, Route, Clock, TrendingUp } from 'lucide-react';
+import { useMemo } from 'react';
+import { Package, Route, CheckCircle, Truck } from 'lucide-react';
 import { Text } from '@/shared/ui';
+import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
+import { RouteStatus } from '@/features/routes/types/route.types';
+
+const ACTIVE_STATUSES = new Set([
+  RouteStatus.DISPATCHED,
+  RouteStatus.IN_TRANSIT,
+  RouteStatus.AT_PICKUP,
+  RouteStatus.LOADED,
+  RouteStatus.AT_DELIVERY,
+  RouteStatus.DELIVERED,
+]);
 
 interface StatItem {
   icon: React.ReactNode;
   label: string;
   value: string;
-  trend?: string;
 }
 
-const stats: StatItem[] = [
-  {
-    icon: <Package size={20} />,
-    label: 'Deliveries',
-    value: '3',
-    trend: 'Today',
-  },
-  {
-    icon: <Route size={20} />,
-    label: 'Distance',
-    value: '127 mi',
-    trend: 'Today',
-  },
-  {
-    icon: <Clock size={20} />,
-    label: 'Hours',
-    value: '6.5h',
-    trend: 'Today',
-  },
-  {
-    icon: <TrendingUp size={20} />,
-    label: 'Rating',
-    value: '4.9',
-    trend: 'Avg',
-  },
-];
-
 export function QuickStats() {
+  const routes = useRoutesStore((state) => state.routes);
+
+  const stats = useMemo<StatItem[]>(() => {
+    const activeCount = routes.filter((r) => ACTIVE_STATUSES.has(r.status)).length;
+    const completedCount = routes.filter((r) => r.status === RouteStatus.COMPLETED).length;
+    const totalMiles = routes.reduce((sum, r) => sum + r.totalMiles, 0);
+    const totalLoads = routes.length;
+
+    return [
+      { icon: <Package size={20} />, label: 'Active', value: String(activeCount) },
+      { icon: <Truck size={20} />, label: 'Miles', value: totalMiles.toLocaleString() },
+      { icon: <CheckCircle size={20} />, label: 'Completed', value: String(completedCount) },
+      { icon: <Route size={20} />, label: 'Total', value: String(totalLoads) },
+    ];
+  }, [routes]);
+
   return (
     <div className="quick-stats">
       {stats.map((stat) => (

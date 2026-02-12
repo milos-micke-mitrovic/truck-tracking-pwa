@@ -1,0 +1,95 @@
+import { useHistory } from 'react-router-dom';
+import { MapPin, Clock, Navigation, Package, Truck } from 'lucide-react';
+import { Text, Button } from '@/shared/ui';
+import { formatDate } from '@/shared/utils';
+import { StopStatusBadge } from './StopStatusBadge';
+import { StopType, StopStatus } from '../types/route.types';
+import type { RouteStopResponse } from '../types/route.types';
+
+interface StopTimelineItemProps {
+  stop: RouteStopResponse;
+  routeId: string;
+}
+
+export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
+  const history = useHistory();
+  const isPickup = stop.type === StopType.PICKUP;
+  const isCompleted = stop.status === StopStatus.COMPLETED;
+
+  const handleNavigate = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (stop.facility.latitude && stop.facility.longitude) {
+      history.push('/tabs/map', {
+        destination: {
+          lat: stop.facility.latitude,
+          lng: stop.facility.longitude,
+          address: `${stop.facility.address}, ${stop.facility.city}, ${stop.facility.state} ${stop.facility.zip}`,
+          customer: stop.facility.name,
+        },
+        navigationTimestamp: Date.now(),
+      });
+    }
+  };
+
+  const handleTap = () => {
+    history.push(`/tabs/loads/${routeId}/stops/${stop.id}`);
+  };
+
+  return (
+    <div
+      className={`stop-timeline-item ${isCompleted ? 'stop-timeline-item--completed' : ''}`}
+      onClick={handleTap}
+    >
+      <div className="stop-timeline-item__indicator">
+        <div
+          className={`stop-timeline-item__dot stop-timeline-item__dot--${isPickup ? 'pickup' : 'delivery'}`}
+        >
+          {isPickup ? <Package size={12} /> : <Truck size={12} />}
+        </div>
+      </div>
+
+      <div className="stop-timeline-item__content">
+        <div className="stop-timeline-item__header">
+          <div>
+            <Text size="xs" color="tertiary" weight="medium">
+              {isPickup ? 'PICKUP' : 'DELIVERY'} #{stop.stopNumber}
+            </Text>
+            <Text size="sm" weight="semibold">
+              {stop.facility.name}
+            </Text>
+          </div>
+          <StopStatusBadge status={stop.status} />
+        </div>
+
+        <div className="stop-timeline-item__location">
+          <MapPin size={14} />
+          <Text size="xs" color="secondary">
+            {stop.facility.city}, {stop.facility.state} {stop.facility.zip}
+          </Text>
+        </div>
+
+        {(stop.appointmentStartDate || stop.appointmentEndDate) && (
+          <div className="stop-timeline-item__appointment">
+            <Clock size={14} />
+            <Text size="xs" color="secondary">
+              {stop.appointmentStartDate && formatDate(stop.appointmentStartDate, 'MMM d, h:mm a')}
+              {stop.appointmentEndDate && ` - ${formatDate(stop.appointmentEndDate, 'h:mm a')}`}
+            </Text>
+          </div>
+        )}
+
+        {!isCompleted && stop.facility.latitude && stop.facility.longitude && (
+          <Button
+            variant="outline"
+            size="small"
+            onClick={handleNavigate}
+            className="stop-timeline-item__nav-btn"
+          >
+            <Navigation size={14} />
+            Navigate
+          </Button>
+        )}
+      </div>
+    </div>
+  );
+}

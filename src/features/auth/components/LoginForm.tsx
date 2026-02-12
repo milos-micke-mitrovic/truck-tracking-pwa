@@ -1,7 +1,7 @@
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useIonRouter } from '@ionic/react';
-import { Button, Input, Alert } from '@/shared/ui';
+import { Button, Input, Toast } from '@/shared/ui';
 import { loginSchema, type LoginFormData } from '../types/auth.schema';
 import { useLogin } from '../hooks/use-login';
 
@@ -16,7 +16,7 @@ export function LoginForm() {
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      username: '',
+      email: '',
       password: '',
     },
   });
@@ -27,7 +27,7 @@ export function LoginForm() {
       await login(data);
       router.push('/tabs/home', 'root', 'replace');
     } catch {
-      // Error is handled by the hook and shown via Alert
+      // Error is handled by the hook and shown via Toast
     }
   };
 
@@ -36,14 +36,14 @@ export function LoginForm() {
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="login-form__fields">
           <Controller
-            name="username"
+            name="email"
             control={control}
             render={({ field: { onChange, onBlur, value } }) => (
               <Input
-                label="Username"
-                type="text"
-                placeholder="Enter your username"
-                error={errors.username?.message}
+                label="Email"
+                type="email"
+                placeholder="Enter your email"
+                error={errors.email?.message}
                 value={value}
                 onIonInput={(e) => onChange(e.detail.value ?? '')}
                 onIonBlur={onBlur}
@@ -74,12 +74,12 @@ export function LoginForm() {
         </div>
       </form>
 
-      <Alert
+      <Toast
         isOpen={!!error}
-        onClose={clearError}
-        header="Login Failed"
         message={error?.message || 'An error occurred during login'}
-        buttons={[{ text: 'Try Again' }]}
+        variant="error"
+        duration={4000}
+        onDidDismiss={clearError}
       />
     </>
   );

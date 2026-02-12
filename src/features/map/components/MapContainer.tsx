@@ -9,7 +9,7 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { IonFabButton, IonIcon } from '@ionic/react';
-import { locateOutline, navigateOutline } from 'ionicons/icons';
+import { locateOutline, navigateOutline, closeOutline } from 'ionicons/icons';
 import { cn } from '@/shared/utils';
 import { useGeolocation } from '@/shared/hooks';
 import { Spinner, Text } from '@/shared/ui';
@@ -28,6 +28,7 @@ import type { Destination } from '../types';
 interface MapContainerProps {
   className?: string;
   destination?: Destination;
+  onClearDestination?: () => void;
 }
 
 // Component to handle follow mode - auto-centers map when position changes
@@ -116,7 +117,7 @@ function MapController({
   return null;
 }
 
-export function MapContainer({ className, destination }: MapContainerProps) {
+export function MapContainer({ className, destination, onClearDestination }: MapContainerProps) {
   const { coordinates, isLoading, error } = useGeolocation({
     enableHighAccuracy: true,
     watchPosition: true,
@@ -245,6 +246,15 @@ export function MapContainer({ className, destination }: MapContainerProps) {
 
       {/* Map Controls */}
       <div className="map-controls">
+        {destination && onClearDestination && (
+          <IonFabButton
+            size="small"
+            onClick={onClearDestination}
+            className="map-controls__button map-controls__button--danger"
+          >
+            <IonIcon icon={closeOutline} />
+          </IonFabButton>
+        )}
         {!followMode && (
           <IonFabButton
             size="small"

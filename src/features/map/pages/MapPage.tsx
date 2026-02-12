@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useLocation, useHistory } from 'react-router-dom';
 import { PageLayout } from '@/shared/components';
 import { MapContainer } from '../components';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import type { Destination } from '../types';
 
 interface LocationState {
@@ -29,9 +30,17 @@ export function MapPage() {
     }
   }, [location.state, history]);
 
+  const handleClearDestination = () => {
+    setDestination(undefined);
+  };
+
   return (
-    <PageLayout title="Map" fullscreen contentClassName="map-page__content">
-      <MapContainer className="map-page__map" destination={destination} />
+    <PageLayout title="Map" headerRightContent={<NotificationBell />} fullscreen contentClassName="map-page__content">
+      <MapContainer
+        className="map-page__map"
+        destination={destination}
+        onClearDestination={handleClearDestination}
+      />
     </PageLayout>
   );
 }
