@@ -47,7 +47,14 @@ export function RouteDetailPage() {
 
 function RouteDetailSkeleton() {
   return (
-    <div style={{ padding: 'var(--spacing-md)', display: 'flex', flexDirection: 'column', gap: 'var(--spacing-md)' }}>
+    <div
+      style={{
+        padding: 'var(--spacing-md)',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 'var(--spacing-md)',
+      }}
+    >
       {/* Header card */}
       <Card>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>

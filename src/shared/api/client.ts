@@ -43,7 +43,7 @@ async function ensureFreshToken(): Promise<void> {
 
   refreshPromise = (async () => {
     try {
-      const url = buildUrl('/auth/refresh');
+      const url = buildUrl('/auth/driver/refresh');
       const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

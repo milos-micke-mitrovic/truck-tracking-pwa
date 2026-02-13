@@ -27,7 +27,7 @@ export function useLogin(): UseLoginReturn {
       setError(null);
 
       try {
-        const data = await apiClient.post<AuthResponse>('/auth/login', {
+        const data = await apiClient.post<AuthResponse>('/auth/driver/login', {
           body: credentials,
         });
 

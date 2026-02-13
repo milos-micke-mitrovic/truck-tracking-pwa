@@ -35,7 +35,12 @@ export function MapPage() {
   };
 
   return (
-    <PageLayout title="Map" headerRightContent={<NotificationBell />} fullscreen contentClassName="map-page__content">
+    <PageLayout
+      title="Map"
+      headerRightContent={<NotificationBell />}
+      fullscreen
+      contentClassName="map-page__content"
+    >
       <MapContainer
         className="map-page__map"
         destination={destination}

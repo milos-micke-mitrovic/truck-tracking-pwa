@@ -24,7 +24,6 @@ export function LoginPage() {
             <div className="login-page__form">
               <LoginForm />
             </div>
-
           </div>
         </IonContent>
       </IonPage>

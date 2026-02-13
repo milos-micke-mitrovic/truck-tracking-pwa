@@ -61,9 +61,7 @@ export function ProfilePage() {
                       value={formatDate(driver.licenseExpiry, 'MMM d, yyyy')}
                     />
                   )}
-                  {driver?.companyName && (
-                    <ProfileRow label="Company" value={driver.companyName} />
-                  )}
+                  {driver?.companyName && <ProfileRow label="Company" value={driver.companyName} />}
                   {driver?.hireDate && (
                     <ProfileRow
                       label="Hire Date"
