@@ -7,12 +7,10 @@ import {
   IonRouterOutlet,
   IonFab,
   IonFabButton,
-  IonPage,
-  IonContent,
   iosTransitionAnimation,
 } from '@ionic/react';
 import { Route, Redirect, useHistory } from 'react-router-dom';
-import { home, person, navigate, cube, bug } from 'ionicons/icons';
+import { home, person, navigate, cube } from 'ionicons/icons';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { MapPage } from '@/features/map/pages/MapPage';
 import { ProfilePage } from '@/features/profile';
@@ -44,7 +42,6 @@ export function TabsLayout() {
           <Route exact path="/tabs/loads/:id/stops/:stopId/pod" component={PodSubmitPage} />
           <Route exact path="/tabs/map" component={MapPage} />
           <Route exact path="/tabs/notifications" component={NotificationsListPage} />
-          <Route exact path="/tabs/test" component={TestPage} />
           <Route exact path="/tabs/profile" component={ProfilePage} />
           <Route exact path="/tabs">
             <Redirect to="/tabs/home" />
@@ -67,9 +64,9 @@ export function TabsLayout() {
             <span />
           </IonTabButton>
 
-          <IonTabButton tab="test" href="/tabs/test">
-            <IonIcon icon={bug} />
-            <IonLabel>Test</IonLabel>
+          {/* Right spacer — mirrors Loads position for symmetry */}
+          <IonTabButton disabled className="tab-button-spacer">
+            <span />
           </IonTabButton>
 
           <IonTabButton tab="profile" href="/tabs/profile">
@@ -94,19 +91,5 @@ export function TabsLayout() {
         onDidDismiss={dismissToast}
       />
     </AuthGuard>
-  );
-}
-
-function TestPage() {
-  return (
-    <IonPage>
-      <IonContent>
-        <div style={{ padding: 40, textAlign: 'center' }}>
-          <h1>Test Page</h1>
-          <p>Build: {new Date().toISOString()}</p>
-          <p>If you see this, the deploy is fresh.</p>
-        </div>
-      </IonContent>
-    </IonPage>
   );
 }
