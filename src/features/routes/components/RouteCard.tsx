@@ -29,14 +29,14 @@ export function RouteCard({ route }: RouteCardProps) {
         <div className="route-card__city">
           <MapPin size={14} />
           <Text size="sm" weight="medium">
-            {route.originCity}, {route.originState}
+            {route.originCity}
           </Text>
         </div>
         <ArrowRight size={16} className="route-card__arrow" />
         <div className="route-card__city">
           <MapPin size={14} />
           <Text size="sm" weight="medium">
-            {route.destinationCity}, {route.destinationState}
+            {route.destinationCity}
           </Text>
         </div>
       </div>

@@ -118,11 +118,9 @@ export interface RouteShortResponse {
   ratePerMile: number;
   totalMiles: number;
   totalStops: number;
-  originCity: string;
-  originState: string;
+  originCity: string; // Format: "City, ST" (e.g., "Chicago, IL")
   originDate: string;
-  destinationCity: string;
-  destinationState: string;
+  destinationCity: string; // Format: "City, ST" (e.g., "Detroit, MI")
   destinationDate: string;
   unitNumber: string;
   driverName: string;

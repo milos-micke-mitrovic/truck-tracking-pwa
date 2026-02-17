@@ -60,7 +60,7 @@ export function useSSE() {
       unsubNotification();
       sseService.disconnect();
     };
-  }, [isAuthenticated, user?.tenantId, user?.driverId]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [isAuthenticated, user?.tenantId, user?.driverId, token]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dismissToast = () => setToast({ isOpen: false, message: '' });
 
