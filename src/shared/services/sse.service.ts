@@ -9,7 +9,7 @@ const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
 const MAX_RECONNECT_ATTEMPTS = 5;
 const BASE_RECONNECT_DELAY_MS = 1000;
 
-const IS_MSW_ENABLED = import.meta.env.VITE_ENABLE_MSW === 'true';
+// const IS_MSW_ENABLED = import.meta.env.VITE_ENABLE_MSW === 'true';
 
 class SSEService {
   private eventSource: EventSource | null = null;
@@ -18,20 +18,22 @@ class SSEService {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private tenantId: string | null = null;
   private driverId: string | null = null;
+  private token: string | null = null;
 
-  connect(tenantId: string, driverId: string): void {
+  connect(tenantId: string, driverId: string, token?: string): void {
     if (this.eventSource) {
       this.disconnect();
     }
 
     this.tenantId = tenantId;
     this.driverId = driverId;
+    this.token = token || null;
     this.reconnectAttempts = 0;
 
-    // MSW can't intercept EventSource — skip real connection in dev mock mode
-    if (!IS_MSW_ENABLED) {
-      this.createConnection();
-    }
+    // TODO: Enable when BE supports ?token= query param for SSE auth
+    // EventSource can't send Authorization headers, so we pass token as query param
+    // Waiting on BE JwtAuthFilter update to read request.getParameter("token")
+    // this.createConnection();
   }
 
   disconnect(): void {
@@ -64,7 +66,10 @@ class SSEService {
   private createConnection(): void {
     if (!this.tenantId || !this.driverId) return;
 
-    const url = `${API_BASE_URL}/sse/subscribe/${this.tenantId}/${this.driverId}`;
+    let url = `${API_BASE_URL}/sse/subscribe/${this.tenantId}/${this.driverId}`;
+    if (this.token) {
+      url += `?token=${encodeURIComponent(this.token)}`;
+    }
 
     try {
       this.eventSource = new EventSource(url);

@@ -26,12 +26,12 @@ ion-page {
 ion-tab-bar {
   --background: var(--color-background);
   --border: none;
-  height: calc(var(--tab-bar-height) + var(--spacing-2) + var(--safe-area-bottom));
+  height: calc(var(--tab-bar-height) + var(--spacing-2));
   border-radius: var(--radius-2xl) var(--radius-2xl) 0 0 !important;
   border-bottom-left-radius: 0 !important;
   border-bottom-right-radius: 0 !important;
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.08);
-  padding-bottom: var(--safe-area-bottom);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   position: relative;
 }
 

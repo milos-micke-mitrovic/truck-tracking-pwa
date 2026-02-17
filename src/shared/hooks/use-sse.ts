@@ -14,6 +14,7 @@ interface SSEToast {
 
 export function useSSE() {
   const user = useAuthStore((state) => state.user);
+  const token = useAuthStore((state) => state.token);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { setRoutes, updateRouteStatus, routes } = useRoutesStore();
   const { addNotification, setUnreadCount, unreadCount } = useNotificationsStore();
@@ -24,7 +25,7 @@ export function useSSE() {
       return;
     }
 
-    sseService.connect(user.tenantId, user.driverId);
+    sseService.connect(user.tenantId, user.driverId, token || undefined);
 
     const unsubAssigned = sseService.on('ROUTE_ASSIGNED', (data) => {
       const route = data as RouteShortResponse;
