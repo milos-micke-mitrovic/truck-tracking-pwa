@@ -30,10 +30,9 @@ class SSEService {
     this.token = token || null;
     this.reconnectAttempts = 0;
 
-    // TODO: Enable when BE supports ?token= query param for SSE auth
     // EventSource can't send Authorization headers, so we pass token as query param
-    // Waiting on BE JwtAuthFilter update to read request.getParameter("token")
-    // this.createConnection();
+    // BE JwtAuthFilter now supports reading request.getParameter("token")
+    this.createConnection();
   }
 
   disconnect(): void {

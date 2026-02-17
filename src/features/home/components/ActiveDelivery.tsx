@@ -74,8 +74,7 @@ export function ActiveDelivery() {
         </div>
         <div className="active-delivery__address">
           <Text size="sm" weight="medium">
-            {activeRoute.originCity}, {activeRoute.originState} &rarr; {activeRoute.destinationCity}
-            , {activeRoute.destinationState}
+            {activeRoute.originCity} &rarr; {activeRoute.destinationCity}
           </Text>
           {nextStop && (
             <Text size="xs" color="secondary">
