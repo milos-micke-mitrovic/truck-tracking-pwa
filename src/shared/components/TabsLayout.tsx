@@ -7,6 +7,8 @@ import {
   IonRouterOutlet,
   IonFab,
   IonFabButton,
+  IonPage,
+  IonContent,
   iosTransitionAnimation,
 } from '@ionic/react';
 import { Route, Redirect, useHistory } from 'react-router-dom';
@@ -97,10 +99,14 @@ export function TabsLayout() {
 
 function TestPage() {
   return (
-    <div style={{ padding: 40, textAlign: 'center' }}>
-      <h1>Test Page</h1>
-      <p>Build: {new Date().toISOString()}</p>
-      <p>If you see this, the deploy is fresh.</p>
-    </div>
+    <IonPage>
+      <IonContent>
+        <div style={{ padding: 40, textAlign: 'center' }}>
+          <h1>Test Page</h1>
+          <p>Build: {new Date().toISOString()}</p>
+          <p>If you see this, the deploy is fresh.</p>
+        </div>
+      </IonContent>
+    </IonPage>
   );
 }
