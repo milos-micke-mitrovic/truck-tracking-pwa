@@ -10,9 +10,9 @@ interface NotificationsState {
   setNotifications: (notifications: NotificationResponse[]) => void;
   appendNotifications: (notifications: NotificationResponse[]) => void;
   addNotification: (notification: NotificationResponse) => void;
-  markAsRead: (id: string) => void;
+  markAsRead: (id: number) => void;
   markAllAsRead: () => void;
-  removeNotification: (id: string) => void;
+  removeNotification: (id: number) => void;
   clearNotifications: () => void;
   setUnreadCount: (count: number) => void;
   setLoading: (loading: boolean) => void;

@@ -52,10 +52,10 @@ export function RouteCard({ route }: RouteCardProps) {
           {route.totalStops} stops
         </Text>
         <Text size="xs" color="secondary">
-          ${route.ratePerMile.toFixed(2)}/mi
+          ${route.ratePerMile?.toFixed(2) ?? '—'}/mi
         </Text>
         <Text size="xs" color="tertiary">
-          {formatDate(route.originDate, 'MMM d')}
+          {route.originDate ? formatDate(route.originDate, 'MMM d') : '—'}
         </Text>
       </div>
     </Card>

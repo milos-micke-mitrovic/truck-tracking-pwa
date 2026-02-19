@@ -17,7 +17,7 @@ export function LoginPage() {
                 Truck Drive
               </Heading>
               <Text color="secondary" className="login-page__subtitle">
-                Sign in to continue
+                Login to continue
               </Text>
             </div>
 

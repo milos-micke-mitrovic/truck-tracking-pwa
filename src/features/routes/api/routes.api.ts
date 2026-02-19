@@ -30,27 +30,27 @@ export const routesApi = {
     });
   },
 
-  getRoute(id: string) {
+  getRoute(id: number | string) {
     return apiClient.get<RouteResponse>(`/routes/${id}`);
   },
 
-  updateRouteStatus(id: string, body: UpdateRouteStatusRequest) {
+  updateRouteStatus(id: number | string, body: UpdateRouteStatusRequest) {
     return apiClient.patch<RouteResponse>(`/routes/${id}/status`, { body });
   },
 
-  getStops(routeId: string) {
+  getStops(routeId: number | string) {
     return apiClient.get<RouteStopResponse[]>(`/routes/${routeId}/stops`);
   },
 
-  updateStop(routeId: string, stopId: string, body: UpdateStopRequest) {
+  updateStop(routeId: number | string, stopId: number | string, body: UpdateStopRequest) {
     return apiClient.put<RouteStopResponse>(`/routes/${routeId}/stops/${stopId}`, { body });
   },
 
-  submitPod(stopId: string, formData: FormData) {
+  submitPod(stopId: number | string, formData: FormData) {
     return apiClient.postFormData<PodSubmissionResponse>(`/stops/${stopId}/pod`, formData);
   },
 
-  getPod(stopId: string) {
+  getPod(stopId: number | string) {
     return apiClient.get<PodSubmissionResponse>(`/stops/${stopId}/pod`);
   },
 };

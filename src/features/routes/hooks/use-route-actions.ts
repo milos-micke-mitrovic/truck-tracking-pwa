@@ -10,7 +10,7 @@ export function useRouteActions() {
   const { updateRouteStatus, setActiveRoute, activeRoute } = useRoutesStore();
 
   const changeRouteStatus = useCallback(
-    async (routeId: string, status: RouteStatus) => {
+    async (routeId: number, status: RouteStatus) => {
       setIsLoading(true);
       setError(null);
 
@@ -31,7 +31,7 @@ export function useRouteActions() {
   );
 
   const updateStopStatus = useCallback(
-    async (routeId: string, stopId: string, status: StopStatus) => {
+    async (routeId: number, stopId: number, status: StopStatus) => {
       setIsLoading(true);
       setError(null);
 

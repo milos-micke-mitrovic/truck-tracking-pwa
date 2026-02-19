@@ -2,12 +2,14 @@ type SSEEventType =
   | 'ROUTE_ASSIGNED'
   | 'ROUTE_UPDATED'
   | 'ROUTE_CANCELLED'
-  | 'NOTIFICATION_RECEIVED';
+  | 'POD_APPROVED'
+  | 'POD_REJECTED'
+  | 'SYSTEM';
 type SSEHandler = (data: unknown) => void;
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '/api';
-const MAX_RECONNECT_ATTEMPTS = 5;
 const BASE_RECONNECT_DELAY_MS = 1000;
+const MAX_RECONNECT_DELAY_MS = 30_000;
 
 // const IS_MSW_ENABLED = import.meta.env.VITE_ENABLE_MSW === 'true';
 
@@ -20,22 +22,38 @@ class SSEService {
   private driverId: string | null = null;
   private token: string | null = null;
 
+  get isConnected(): boolean {
+    return this.eventSource?.readyState === EventSource.OPEN;
+  }
+
   connect(tenantId: string, driverId: string, token?: string): void {
-    if (this.eventSource) {
-      this.disconnect();
-    }
+    this.closeConnection();
 
     this.tenantId = tenantId;
     this.driverId = driverId;
     this.token = token || null;
     this.reconnectAttempts = 0;
 
-    // EventSource can't send Authorization headers, so we pass token as query param
-    // BE JwtAuthFilter now supports reading request.getParameter("token")
+    this.createConnection();
+  }
+
+  reconnect(): void {
+    if (this.isConnected) return;
+    if (!this.tenantId || !this.driverId) return;
+
+    this.closeConnection();
+    this.reconnectAttempts = 0;
     this.createConnection();
   }
 
   disconnect(): void {
+    this.closeConnection();
+    this.tenantId = null;
+    this.driverId = null;
+    this.token = null;
+  }
+
+  private closeConnection(): void {
     if (this.reconnectTimer) {
       clearTimeout(this.reconnectTimer);
       this.reconnectTimer = null;
@@ -46,8 +64,6 @@ class SSEService {
       this.eventSource = null;
     }
 
-    this.tenantId = null;
-    this.driverId = null;
     this.reconnectAttempts = 0;
   }
 
@@ -88,7 +104,9 @@ class SSEService {
         'ROUTE_ASSIGNED',
         'ROUTE_UPDATED',
         'ROUTE_CANCELLED',
-        'NOTIFICATION_RECEIVED',
+        'POD_APPROVED',
+        'POD_REJECTED',
+        'SYSTEM',
       ];
       for (const type of eventTypes) {
         this.eventSource.addEventListener(type, (event: MessageEvent) => {
@@ -134,11 +152,10 @@ class SSEService {
   }
 
   private scheduleReconnect(): void {
-    if (this.reconnectAttempts >= MAX_RECONNECT_ATTEMPTS) {
-      return;
-    }
-
-    const delay = BASE_RECONNECT_DELAY_MS * Math.pow(2, this.reconnectAttempts);
+    const delay = Math.min(
+      BASE_RECONNECT_DELAY_MS * Math.pow(2, this.reconnectAttempts),
+      MAX_RECONNECT_DELAY_MS
+    );
     this.reconnectAttempts++;
 
     this.reconnectTimer = setTimeout(() => {

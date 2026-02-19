@@ -10,36 +10,42 @@ export function RouteInfoSection({ route }: RouteInfoSectionProps) {
     <div className="route-info-section">
       <Card title="Dispatch Info" className="route-info-section__card">
         <div className="route-info-section__rows">
-          <InfoRow
-            label="Dispatcher"
-            value={`${route.dispatcher.firstName} ${route.dispatcher.lastName}`}
-          />
-          <InfoRow label="Broker" value={route.broker.name} />
-          <InfoRow label="Broker ID" value={route.broker.identifier} />
-          <InfoRow label="Vehicle" value={route.vehicle.unitNumber} />
+          {route.dispatcher && <InfoRow label="Dispatcher" value={route.dispatcher.name} />}
+          {route.broker && (
+            <InfoRow label="Broker" value={route.broker.legalName || route.broker.dbaName || '—'} />
+          )}
+          {route.brokerIdentifier && <InfoRow label="Broker ID" value={route.brokerIdentifier} />}
+          {route.vehicle && <InfoRow label="Vehicle" value={route.vehicle.unitId} />}
         </div>
       </Card>
 
       {route.loadDetails && (
         <Card title="Load Details" className="route-info-section__card">
           <div className="route-info-section__rows">
-            <InfoRow label="Commodity" value={route.loadDetails.commodity} />
-            <InfoRow
-              label="Weight"
-              value={`${route.loadDetails.weight.toLocaleString()} ${route.loadDetails.weightUnit}`}
-            />
-            <InfoRow label="Pieces" value={String(route.loadDetails.pieces)} />
-            {route.loadDetails.pallets > 0 && (
-              <InfoRow label="Pallets" value={String(route.loadDetails.pallets)} />
+            {route.loadDetails.commodity && (
+              <InfoRow label="Commodity" value={route.loadDetails.commodity} />
             )}
-            {route.loadDetails.temperature !== null && (
+            {route.loadDetails.weight && (
               <InfoRow
-                label="Temperature"
-                value={`${route.loadDetails.temperature}${route.loadDetails.temperatureUnit || ''}`}
+                label="Weight"
+                value={`${route.loadDetails.weight} ${route.loadDetails.weightUnit ?? ''}`}
               />
             )}
-            {route.loadDetails.hazmat && <InfoRow label="Hazmat" value="Yes" />}
-            {route.loadDetails.notes && <InfoRow label="Notes" value={route.loadDetails.notes} />}
+            {route.loadDetails.unitCount != null && (
+              <InfoRow
+                label="Units"
+                value={`${route.loadDetails.unitCount} ${route.loadDetails.unitType ?? ''}`}
+              />
+            )}
+            {route.loadDetails.capacity && (
+              <InfoRow label="Capacity" value={route.loadDetails.capacity} />
+            )}
+            {route.loadDetails.lengthFeet && (
+              <InfoRow label="Length" value={route.loadDetails.lengthFeet} />
+            )}
+            {route.loadDetails.temperature && (
+              <InfoRow label="Temperature" value={route.loadDetails.temperature} />
+            )}
           </div>
         </Card>
       )}

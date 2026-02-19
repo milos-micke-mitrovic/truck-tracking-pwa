@@ -86,7 +86,7 @@ export function TabsLayout() {
       <Toast
         isOpen={toast.isOpen}
         message={toast.message}
-        variant="info"
+        variant={toast.variant}
         duration={4000}
         onDidDismiss={dismissToast}
       />

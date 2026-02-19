@@ -3,11 +3,11 @@ import type { RouteStopResponse } from '../types/route.types';
 
 interface RouteStopTimelineProps {
   stops: RouteStopResponse[];
-  routeId: string;
+  routeId: number;
 }
 
 export function RouteStopTimeline({ stops, routeId }: RouteStopTimelineProps) {
-  const sortedStops = [...stops].sort((a, b) => a.stopNumber - b.stopNumber);
+  const sortedStops = [...stops].sort((a, b) => a.stopOrder - b.stopOrder);
 
   return (
     <div className="route-stop-timeline">

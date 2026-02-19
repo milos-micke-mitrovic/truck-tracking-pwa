@@ -8,9 +8,10 @@ interface RoutesState {
   isLoading: boolean;
   error: string | null;
   setRoutes: (routes: RouteShortResponse[]) => void;
+  addRoute: (route: RouteShortResponse) => void;
   setActiveRoute: (route: RouteResponse | null) => void;
-  updateRouteInList: (id: string, updates: Partial<RouteShortResponse>) => void;
-  updateRouteStatus: (id: string, status: RouteStatus) => void;
+  updateRouteInList: (id: number, updates: Partial<RouteShortResponse>) => void;
+  updateRouteStatus: (id: number, status: RouteStatus) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
@@ -24,6 +25,13 @@ export const useRoutesStore = create<RoutesState>()(
       error: null,
 
       setRoutes: (routes) => set({ routes }),
+
+      addRoute: (route) =>
+        set((state) => ({
+          routes: state.routes.some((r) => r.id === route.id)
+            ? state.routes
+            : [...state.routes, route],
+        })),
 
       setActiveRoute: (route) => set({ activeRoute: route }),
 

@@ -123,7 +123,8 @@
 
 /* Pulse */
 @keyframes pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -133,7 +134,8 @@
 
 /* Bounce */
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(-25%);
     animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
   }
@@ -145,13 +147,21 @@
 
 /* Shake */
 @keyframes shake {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateX(0);
   }
-  10%, 30%, 50%, 70%, 90% {
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
     transform: translateX(-4px);
   }
-  20%, 40%, 60%, 80% {
+  20%,
+  40%,
+  60%,
+  80% {
     transform: translateX(4px);
   }
 }
@@ -241,7 +251,8 @@
 }
 
 .transition-colors {
-  transition: color var(--transition-duration-normal) var(--transition-timing-ease-out),
+  transition:
+    color var(--transition-duration-normal) var(--transition-timing-ease-out),
     background-color var(--transition-duration-normal) var(--transition-timing-ease-out),
     border-color var(--transition-duration-normal) var(--transition-timing-ease-out);
 }

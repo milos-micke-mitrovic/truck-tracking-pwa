@@ -48,7 +48,7 @@ export const notificationsHandlers = [
   http.patch('/api/notifications/:id/read', async ({ params }) => {
     await delay(300);
 
-    const id = params.id as string;
+    const id = Number(params.id);
     const index = notificationsList.findIndex((n) => n.id === id);
 
     if (index === -1) {
@@ -85,7 +85,7 @@ export const notificationsHandlers = [
   http.delete('/api/notifications/:id', async ({ params }) => {
     await delay(300);
 
-    const id = params.id as string;
+    const id = Number(params.id);
     const index = notificationsList.findIndex((n) => n.id === id);
 
     if (index === -1) {

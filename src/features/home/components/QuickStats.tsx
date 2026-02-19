@@ -5,6 +5,7 @@ import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
 import { RouteStatus } from '@/features/routes/types/route.types';
 
 const ACTIVE_STATUSES = new Set([
+  RouteStatus.BOOKED,
   RouteStatus.DISPATCHED,
   RouteStatus.IN_TRANSIT,
   RouteStatus.AT_PICKUP,
@@ -25,7 +26,7 @@ export function QuickStats() {
   const stats = useMemo<StatItem[]>(() => {
     const activeCount = routes.filter((r) => ACTIVE_STATUSES.has(r.status)).length;
     const completedCount = routes.filter((r) => r.status === RouteStatus.COMPLETED).length;
-    const totalMiles = routes.reduce((sum, r) => sum + r.totalMiles, 0);
+    const totalMiles = routes.reduce((sum, r) => sum + (r.totalMiles ?? 0), 0);
     const totalLoads = routes.length;
 
     return [

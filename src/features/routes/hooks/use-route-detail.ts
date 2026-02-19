@@ -11,7 +11,7 @@ export function useRouteDetail(routeId: string | undefined) {
   const fetchRoute = useCallback(async () => {
     if (!routeId) return;
 
-    if (activeRoute?.id === routeId) {
+    if (String(activeRoute?.id) === routeId) {
       return;
     }
 
@@ -49,7 +49,7 @@ export function useRouteDetail(routeId: string | undefined) {
   }, [fetchRoute]);
 
   return {
-    route: activeRoute?.id === routeId ? activeRoute : null,
+    route: String(activeRoute?.id) === routeId ? activeRoute : null,
     isLoading,
     error,
     refresh,

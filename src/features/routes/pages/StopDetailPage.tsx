@@ -5,7 +5,7 @@ import { Header, Card, Text, Button, Badge } from '@/shared/ui';
 import { formatDate } from '@/shared/utils';
 import { StopStatusBadge } from '../components/StopStatusBadge';
 import { useRouteDetail } from '../hooks/use-route-detail';
-import { StopType, PodStatus } from '../types/route.types';
+import { StopType } from '../types/route.types';
 import type { RouteStopResponse } from '../types/route.types';
 
 export function StopDetailPage() {
@@ -13,7 +13,7 @@ export function StopDetailPage() {
   const history = useHistory();
   const { route } = useRouteDetail(routeId);
 
-  const stop: RouteStopResponse | undefined = route?.stops.find((s) => s.id === stopId);
+  const stop: RouteStopResponse | undefined = route?.stops.find((s) => String(s.id) === stopId);
 
   if (!stop) {
     return (
@@ -38,12 +38,12 @@ export function StopDetailPage() {
   const isDelivery = stop.type === StopType.DELIVERY;
 
   const handleNavigate = () => {
-    if (stop.facility.latitude && stop.facility.longitude) {
+    if (stop.facility?.latitude && stop.facility?.longitude) {
       history.push('/tabs/map', {
         destination: {
           lat: stop.facility.latitude,
           lng: stop.facility.longitude,
-          address: `${stop.facility.address}, ${stop.facility.city}, ${stop.facility.state} ${stop.facility.zip}`,
+          address: `${stop.facility.address ?? ''}, ${stop.facility.city ?? ''}, ${stop.facility.state ?? ''}`,
           customer: stop.facility.name,
         },
         navigationTimestamp: Date.now(),
@@ -58,7 +58,7 @@ export function StopDetailPage() {
   return (
     <IonPage>
       <Header
-        title={`${stop.type === StopType.PICKUP ? 'Pickup' : 'Delivery'} #${stop.stopNumber}`}
+        title={`${stop.type === StopType.PICKUP ? 'Pickup' : 'Delivery'} #${stop.stopOrder + 1}`}
         leftContent={
           <IonButtons slot="start">
             <IonBackButton defaultHref={`/tabs/loads/${routeId}`} />
@@ -74,44 +74,36 @@ export function StopDetailPage() {
             </div>
 
             <Text size="lg" weight="semibold">
-              {stop.facility.name}
+              {stop.facility?.name ?? 'Unknown Facility'}
             </Text>
 
             <div className="stop-detail-page__address">
               <MapPin size={16} />
               <Text size="sm" color="secondary">
-                {stop.facility.address}, {stop.facility.city}, {stop.facility.state}{' '}
-                {stop.facility.zip}
+                {stop.facility?.address}, {stop.facility?.city}, {stop.facility?.state}
               </Text>
             </div>
 
-            {(stop.appointmentStartDate || stop.appointmentEndDate) && (
+            {(stop.arrivalStartDate || stop.arrivalEndDate) && (
               <div className="stop-detail-page__appointment">
                 <Clock size={16} />
                 <Text size="sm" color="secondary">
-                  {stop.appointmentStartDate &&
-                    formatDate(stop.appointmentStartDate, 'MMM d, h:mm a')}
-                  {stop.appointmentEndDate && ` - ${formatDate(stop.appointmentEndDate, 'h:mm a')}`}
+                  {stop.arrivalStartDate && formatDate(stop.arrivalStartDate, 'MMM d, h:mm a')}
+                  {stop.arrivalEndDate && ` - ${formatDate(stop.arrivalEndDate, 'h:mm a')}`}
                 </Text>
               </div>
-            )}
-
-            {stop.notes && (
-              <Text size="sm" color="secondary" className="stop-detail-page__notes">
-                {stop.notes}
-              </Text>
             )}
           </Card>
 
           <div className="stop-detail-page__actions">
-            {stop.facility.latitude && stop.facility.longitude && (
+            {stop.facility?.latitude && stop.facility?.longitude && (
               <Button variant="solid" fullWidth onClick={handleNavigate}>
                 <Navigation size={18} />
                 Navigate to Facility
               </Button>
             )}
 
-            {isDelivery && stop.podStatus === PodStatus.NOT_SUBMITTED && (
+            {isDelivery && (
               <Button variant="outline" fullWidth onClick={handleSubmitPod}>
                 <Camera size={18} />
                 Submit POD
@@ -159,14 +151,6 @@ export function StopDetailPage() {
                   </div>
                 ))}
               </div>
-            </Card>
-          )}
-
-          {stop.podStatus !== PodStatus.NOT_SUBMITTED && (
-            <Card title="POD Status" className="stop-detail-page__card">
-              <Badge variant={stop.podStatus === PodStatus.APPROVED ? 'success' : 'info'}>
-                {stop.podStatus}
-              </Badge>
             </Card>
           )}
         </div>
