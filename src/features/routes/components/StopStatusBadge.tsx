@@ -6,9 +6,8 @@ const statusConfig: Record<StopStatus, { label: string; variant: BadgeProps['var
   [StopStatus.EN_ROUTE]: { label: 'En Route', variant: 'info' },
   [StopStatus.ARRIVED]: { label: 'Arrived', variant: 'warning' },
   [StopStatus.LOADING]: { label: 'Loading', variant: 'warning' },
-  [StopStatus.LOADED]: { label: 'Loaded', variant: 'info' },
   [StopStatus.UNLOADING]: { label: 'Unloading', variant: 'warning' },
-  [StopStatus.UNLOADED]: { label: 'Unloaded', variant: 'info' },
+  [StopStatus.DEPARTED]: { label: 'Departed', variant: 'info' },
   [StopStatus.COMPLETED]: { label: 'Completed', variant: 'success' },
   [StopStatus.SKIPPED]: { label: 'Skipped', variant: 'danger' },
 };

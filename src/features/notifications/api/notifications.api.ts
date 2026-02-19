@@ -3,7 +3,7 @@ import type { PaginatedResponse } from '@/shared/types/api.types';
 import type { NotificationResponse, UnreadCountResponse } from '../types/notification.types';
 
 interface GetNotificationsParams {
-  driverId?: string;
+  driverId?: number | string;
   page?: number;
   size?: number;
 }
@@ -19,27 +19,31 @@ export const notificationsApi = {
     });
   },
 
-  getUnreadCount(driverId: string) {
+  getUnreadCount(driverId: number | string) {
     return apiClient.get<UnreadCountResponse>('/notifications/unread-count', {
       params: { driverId },
     });
   },
 
-  markAsRead(id: string) {
-    return apiClient.patch<NotificationResponse>(`/notifications/${id}/read`);
+  markAsRead(id: number | string, driverId: number | string) {
+    return apiClient.patch<NotificationResponse>(`/notifications/${id}/read`, {
+      params: { driverId },
+    });
   },
 
-  markAllAsRead(driverId: string) {
+  markAllAsRead(driverId: number | string) {
     return apiClient.patch<{ count: number }>('/notifications/read-all', {
       params: { driverId },
     });
   },
 
-  deleteNotification(id: string) {
-    return apiClient.delete<void>(`/notifications/${id}`);
+  deleteNotification(id: number | string, driverId: number | string) {
+    return apiClient.delete<void>(`/notifications/${id}`, {
+      params: { driverId },
+    });
   },
 
-  deleteAllNotifications(driverId: string) {
+  deleteAllNotifications(driverId: number | string) {
     return apiClient.delete<{ count: number }>('/notifications', {
       params: { driverId },
     });

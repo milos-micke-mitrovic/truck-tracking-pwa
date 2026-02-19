@@ -69,7 +69,7 @@ export function LoginForm() {
 
         <div className="login-form__actions">
           <Button type="submit" fullWidth loading={isLoading}>
-            Sign In
+            Login
           </Button>
         </div>
       </form>

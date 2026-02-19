@@ -200,13 +200,13 @@ ion-button {
   letter-spacing: normal;
 }
 
-ion-button[size="small"] {
+ion-button[size='small'] {
   --padding-start: var(--spacing-3);
   --padding-end: var(--spacing-3);
   height: var(--button-height-sm);
 }
 
-ion-button[size="large"] {
+ion-button[size='large'] {
   --padding-start: var(--spacing-6);
   --padding-end: var(--spacing-6);
   height: var(--button-height-lg);
@@ -496,6 +496,8 @@ ion-skeleton-text {
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  max-width: 400px;
+  margin: 0 auto;
   padding: var(--spacing-lg);
   padding-top: calc(var(--spacing-lg) + var(--safe-area-top));
   padding-bottom: calc(var(--spacing-lg) + var(--safe-area-bottom));

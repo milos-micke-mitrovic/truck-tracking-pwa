@@ -13,6 +13,7 @@ interface QuickAction {
 }
 
 const ACTIVE_STATUSES = new Set([
+  RouteStatus.BOOKED,
   RouteStatus.DISPATCHED,
   RouteStatus.IN_TRANSIT,
   RouteStatus.AT_PICKUP,

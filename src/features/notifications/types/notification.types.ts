@@ -18,13 +18,14 @@ export enum ReferenceType {
 // --- Response Types ---
 
 export interface NotificationResponse {
-  id: string;
-  tenantId: string;
-  driverId: string;
+  id: number;
+  tenantId: number;
+  recipientDriverId: number;
   type: NotificationType;
+  channel: string;
   title: string;
-  message: string;
-  referenceId: string | null;
+  body: string;
+  referenceId: number | null;
   referenceType: ReferenceType | null;
   read: boolean;
   createdAt: string;

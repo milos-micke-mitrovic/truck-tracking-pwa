@@ -8,7 +8,7 @@ import type { RouteStopResponse } from '../types/route.types';
 
 interface StopTimelineItemProps {
   stop: RouteStopResponse;
-  routeId: string;
+  routeId: number;
 }
 
 export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
@@ -18,12 +18,12 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
 
   const handleNavigate = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (stop.facility.latitude && stop.facility.longitude) {
+    if (stop.facility?.latitude && stop.facility?.longitude) {
       history.push('/tabs/map', {
         destination: {
           lat: stop.facility.latitude,
           lng: stop.facility.longitude,
-          address: `${stop.facility.address}, ${stop.facility.city}, ${stop.facility.state} ${stop.facility.zip}`,
+          address: `${stop.facility.address ?? ''}, ${stop.facility.city ?? ''}, ${stop.facility.state ?? ''}`,
           customer: stop.facility.name,
         },
         navigationTimestamp: Date.now(),
@@ -52,10 +52,10 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
         <div className="stop-timeline-item__header">
           <div>
             <Text size="xs" color="tertiary" weight="medium">
-              {isPickup ? 'PICKUP' : 'DELIVERY'} #{stop.stopNumber}
+              {isPickup ? 'PICKUP' : 'DELIVERY'} #{stop.stopOrder + 1}
             </Text>
             <Text size="sm" weight="semibold">
-              {stop.facility.name}
+              {stop.facility?.name ?? 'Unknown Facility'}
             </Text>
           </div>
           <StopStatusBadge status={stop.status} />
@@ -64,21 +64,21 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
         <div className="stop-timeline-item__location">
           <MapPin size={14} />
           <Text size="xs" color="secondary">
-            {stop.facility.city}, {stop.facility.state} {stop.facility.zip}
+            {stop.facility?.city}, {stop.facility?.state}
           </Text>
         </div>
 
-        {(stop.appointmentStartDate || stop.appointmentEndDate) && (
+        {(stop.arrivalStartDate || stop.arrivalEndDate) && (
           <div className="stop-timeline-item__appointment">
             <Clock size={14} />
             <Text size="xs" color="secondary">
-              {stop.appointmentStartDate && formatDate(stop.appointmentStartDate, 'MMM d, h:mm a')}
-              {stop.appointmentEndDate && ` - ${formatDate(stop.appointmentEndDate, 'h:mm a')}`}
+              {stop.arrivalStartDate && formatDate(stop.arrivalStartDate, 'MMM d, h:mm a')}
+              {stop.arrivalEndDate && ` - ${formatDate(stop.arrivalEndDate, 'h:mm a')}`}
             </Text>
           </div>
         )}
 
-        {!isCompleted && stop.facility.latitude && stop.facility.longitude && (
+        {!isCompleted && stop.facility?.latitude && stop.facility?.longitude && (
           <Button
             variant="outline"
             size="small"

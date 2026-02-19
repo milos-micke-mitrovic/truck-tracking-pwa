@@ -2,7 +2,7 @@ import { Badge, type BadgeProps } from '@/shared/ui';
 import { RouteStatus } from '../types/route.types';
 
 const statusConfig: Record<RouteStatus, { label: string; variant: BadgeProps['variant'] }> = {
-  [RouteStatus.CREATED]: { label: 'Created', variant: 'default' },
+  [RouteStatus.BOOKED]: { label: 'Booked', variant: 'default' },
   [RouteStatus.DISPATCHED]: { label: 'Dispatched', variant: 'info' },
   [RouteStatus.IN_TRANSIT]: { label: 'In Transit', variant: 'warning' },
   [RouteStatus.AT_PICKUP]: { label: 'At Pickup', variant: 'warning' },
@@ -10,6 +10,8 @@ const statusConfig: Record<RouteStatus, { label: string; variant: BadgeProps['va
   [RouteStatus.AT_DELIVERY]: { label: 'At Delivery', variant: 'warning' },
   [RouteStatus.DELIVERED]: { label: 'Delivered', variant: 'success' },
   [RouteStatus.COMPLETED]: { label: 'Completed', variant: 'success' },
+  [RouteStatus.INVOICED]: { label: 'Invoiced', variant: 'success' },
+  [RouteStatus.PAID]: { label: 'Paid', variant: 'success' },
   [RouteStatus.CANCELLED]: { label: 'Cancelled', variant: 'danger' },
 };
 

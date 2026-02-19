@@ -43,7 +43,7 @@ export function NotificationCard({ notification }: NotificationCardProps) {
   const handleClick = () => {
     if (!notification.read) {
       markAsRead(notification.id);
-      notificationsApi.markAsRead(notification.id).catch(() => {});
+      notificationsApi.markAsRead(notification.id, notification.recipientDriverId).catch(() => {});
     }
 
     if (notification.referenceId && notification.referenceType) {
@@ -60,7 +60,9 @@ export function NotificationCard({ notification }: NotificationCardProps) {
 
   const handleDelete = () => {
     removeNotification(notification.id);
-    notificationsApi.deleteNotification(notification.id).catch(() => {});
+    notificationsApi
+      .deleteNotification(notification.id, notification.recipientDriverId)
+      .catch(() => {});
     void slidingRef.current?.close();
   };
 
@@ -85,7 +87,7 @@ export function NotificationCard({ notification }: NotificationCardProps) {
               {!notification.read && <span className="notification-card__dot" />}
             </div>
             <Text size="xs" color="secondary" className="notification-card__message">
-              {notification.message}
+              {notification.body}
             </Text>
             <Text size="xs" color="tertiary">
               {formatRelativeDate(notification.createdAt)}

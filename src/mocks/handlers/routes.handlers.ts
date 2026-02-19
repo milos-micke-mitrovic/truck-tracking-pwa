@@ -9,7 +9,7 @@ import type {
 
 // Mutable copies for state changes during the session
 let routesList = [...mockRoutesShort];
-const routeDetails = { ...mockRouteDetails };
+const routeDetails: Record<string, RouteResponse> = { ...mockRouteDetails };
 
 export const routesHandlers = [
   // GET /api/routes — paginated list
@@ -70,6 +70,7 @@ export const routesHandlers = [
     await delay(300);
 
     const id = params.id as string;
+    const numericId = Number(id);
     const body = (await request.json()) as { status: RouteStatus };
     const route = routeDetails[id];
 
@@ -84,7 +85,7 @@ export const routesHandlers = [
     };
     routeDetails[id] = updated;
 
-    routesList = routesList.map((r) => (r.id === id ? { ...r, status: body.status } : r));
+    routesList = routesList.map((r) => (r.id === numericId ? { ...r, status: body.status } : r));
 
     return HttpResponse.json(updated);
   }),
@@ -108,7 +109,7 @@ export const routesHandlers = [
     await delay(300);
 
     const routeId = params.routeId as string;
-    const stopId = params.stopId as string;
+    const stopId = Number(params.stopId);
     const body = (await request.json()) as Partial<RouteStopResponse>;
     const route = routeDetails[routeId];
 
@@ -139,9 +140,8 @@ export const routesHandlers = [
 
     return HttpResponse.json({
       id: `pod-${stopId}`,
-      stopId,
+      stopId: Number(stopId),
       status: PodStatus.SUBMITTED,
-      notes: null,
       documents: [
         {
           id: `doc-${Date.now()}`,
@@ -160,17 +160,16 @@ export const routesHandlers = [
   http.get('/api/stops/:stopId/pod', async ({ params }) => {
     await delay(200);
 
-    const stopId = params.stopId as string;
+    const stopId = Number(params.stopId);
 
-    // Check if the stop has a submitted POD
+    // Check if the stop exists in any route
     for (const route of Object.values(routeDetails)) {
       const stop = route.stops.find((s) => s.id === stopId);
-      if (stop && stop.podStatus !== PodStatus.NOT_SUBMITTED) {
+      if (stop) {
         return HttpResponse.json({
           id: `pod-${stopId}`,
           stopId,
-          status: stop.podStatus,
-          notes: 'Delivered in good condition',
+          status: PodStatus.SUBMITTED,
           documents: [
             {
               id: `doc-${stopId}-1`,
@@ -181,7 +180,7 @@ export const routesHandlers = [
             },
           ],
           submittedAt: '2025-06-12T13:40:00Z',
-          reviewedAt: stop.podStatus === PodStatus.APPROVED ? '2025-06-12T14:00:00Z' : null,
+          reviewedAt: null,
         });
       }
     }
