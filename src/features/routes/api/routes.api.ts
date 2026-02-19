@@ -7,6 +7,8 @@ import type {
   UpdateRouteStatusRequest,
   UpdateStopRequest,
   PodSubmissionResponse,
+  PodSubmissionRequest,
+  TempFileResult,
 } from '../types/route.types';
 
 interface GetRoutesParams {
@@ -46,8 +48,18 @@ export const routesApi = {
     return apiClient.put<RouteStopResponse>(`/routes/${routeId}/stops/${stopId}`, { body });
   },
 
-  submitPod(stopId: number | string, formData: FormData) {
-    return apiClient.postFormData<PodSubmissionResponse>(`/stops/${stopId}/pod`, formData);
+  uploadTempDocument(file: File) {
+    const formData = new FormData();
+    formData.append('file', file);
+    return apiClient.postFormData<TempFileResult>('/documents/upload/temp', formData);
+  },
+
+  deleteTempDocument(tempFileName: string) {
+    return apiClient.delete(`/documents/temp/${tempFileName}`);
+  },
+
+  submitPod(stopId: number | string, request: PodSubmissionRequest) {
+    return apiClient.post<PodSubmissionResponse>(`/stops/${stopId}/pod`, { body: request });
   },
 
   getPod(stopId: number | string) {

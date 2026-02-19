@@ -11,21 +11,30 @@ export function usePodSubmit() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<PodSubmissionResponse | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<string | null>(null);
 
   const submitPod = useCallback(async (stopId: string, photos: PodPhoto[], notes?: string) => {
     setIsLoading(true);
     setError(null);
+    setUploadProgress('Uploading photos...');
 
     try {
-      const formData = new FormData();
-      photos.forEach((photo) => {
-        formData.append('files', photo.file);
-      });
-      if (notes) {
-        formData.append('notes', notes);
-      }
+      const tempResults = await Promise.all(
+        photos.map((photo) => routesApi.uploadTempDocument(photo.file))
+      );
 
-      const response = await routesApi.submitPod(stopId, formData);
+      const documents = tempResults.map((result) => ({
+        tempFileName: result.tempFileName,
+        originalFileName: result.originalFileName,
+      }));
+
+      setUploadProgress('Submitting POD...');
+
+      const response = await routesApi.submitPod(stopId, {
+        notes,
+        documents,
+      });
+
       setResult(response);
       return response;
     } catch (err) {
@@ -34,6 +43,7 @@ export function usePodSubmit() {
       throw err;
     } finally {
       setIsLoading(false);
+      setUploadProgress(null);
     }
   }, []);
 
@@ -53,5 +63,6 @@ export function usePodSubmit() {
     isLoading,
     error,
     result,
+    uploadProgress,
   };
 }

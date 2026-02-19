@@ -132,6 +132,18 @@ export const routesHandlers = [
     return HttpResponse.json(updatedStop);
   }),
 
+  // POST /api/documents/upload/temp — upload temp document
+  http.post('/api/documents/upload/temp', async () => {
+    await delay(300);
+
+    const tempFileName = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    return HttpResponse.json({
+      tempFileName,
+      originalFileName: 'pod-photo.jpg',
+      fileSize: 102400,
+    });
+  }),
+
   // POST /api/stops/:stopId/pod — submit POD
   http.post('/api/stops/:stopId/pod', async ({ params }) => {
     await delay(500);
@@ -141,17 +153,23 @@ export const routesHandlers = [
     return HttpResponse.json({
       id: `pod-${stopId}`,
       stopId: Number(stopId),
+      routeId: 1,
+      driverId: 1,
+      driverName: 'Mock Driver',
       status: PodStatus.SUBMITTED,
+      notes: null,
       documents: [
         {
           id: `doc-${Date.now()}`,
-          fileName: 'pod-photo-1.jpg',
-          fileUrl: '/mock/pod-photo-1.jpg',
-          fileType: 'image/jpeg',
-          uploadedAt: new Date().toISOString(),
+          fileName: 'pod-photo.jpg',
+          originalFileName: 'pod-photo.jpg',
+          fileSize: 102400,
+          contentType: 'image/jpeg',
+          sortOrder: 0,
         },
       ],
       submittedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
       reviewedAt: null,
     });
   }),
@@ -169,17 +187,23 @@ export const routesHandlers = [
         return HttpResponse.json({
           id: `pod-${stopId}`,
           stopId,
+          routeId: route.id,
+          driverId: route.driver?.id ?? 1,
+          driverName: route.driver?.name ?? 'Mock Driver',
           status: PodStatus.SUBMITTED,
+          notes: null,
           documents: [
             {
               id: `doc-${stopId}-1`,
               fileName: 'pod-photo-1.jpg',
-              fileUrl: '/mock/pod-photo-1.jpg',
-              fileType: 'image/jpeg',
-              uploadedAt: '2025-06-12T13:40:00Z',
+              originalFileName: 'pod-photo-1.jpg',
+              fileSize: 102400,
+              contentType: 'image/jpeg',
+              sortOrder: 0,
             },
           ],
           submittedAt: '2025-06-12T13:40:00Z',
+          createdAt: '2025-06-12T13:40:00Z',
           reviewedAt: null,
         });
       }

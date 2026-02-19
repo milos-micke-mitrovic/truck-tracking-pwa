@@ -269,23 +269,46 @@ export interface RouteResponse {
   updatedAt: string;
 }
 
+// --- Temp Upload ---
+
+export interface TempFileResult {
+  tempFileName: string;
+  originalFileName: string;
+  fileSize: number;
+}
+
+export interface PodDocumentRequest {
+  tempFileName: string;
+  originalFileName: string;
+}
+
+export interface PodSubmissionRequest {
+  notes?: string;
+  documents: PodDocumentRequest[];
+}
+
 // --- POD ---
 
 export interface PodDocumentResponse {
   id: number;
   fileName: string;
-  fileUrl: string;
-  fileType: string;
-  uploadedAt: string;
+  originalFileName: string;
+  fileSize: number;
+  contentType: string;
+  sortOrder: number;
 }
 
 export interface PodSubmissionResponse {
   id: number;
   stopId: number;
+  routeId: number;
+  driverId: number;
+  driverName: string;
   status: PodStatus;
   notes: string | null;
   documents: PodDocumentResponse[];
   submittedAt: string;
+  createdAt: string;
   reviewedAt: string | null;
 }
 

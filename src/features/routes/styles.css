@@ -308,6 +308,11 @@
   gap: var(--spacing-md);
 }
 
+.pod-submit-page__error {
+  color: var(--ion-color-danger, #eb445a);
+  text-align: center;
+}
+
 .pod-photo-gallery {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

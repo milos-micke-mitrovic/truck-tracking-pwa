@@ -9,7 +9,7 @@ import { useCamera, type CameraPhoto } from '@/shared/hooks/use-camera';
 export function PodSubmitPage() {
   const { id: routeId, stopId } = useParams<{ id: string; stopId: string }>();
   const history = useHistory();
-  const { submitPod, isLoading } = usePodSubmit();
+  const { submitPod, isLoading, error, uploadProgress } = usePodSubmit();
   const { takePhoto } = useCamera();
   const [photos, setPhotos] = useState<CameraPhoto[]>([]);
   const [notes, setNotes] = useState('');
@@ -77,6 +77,12 @@ export function PodSubmitPage() {
             />
           </Card>
 
+          {error && (
+            <Text size="sm" className="pod-submit-page__error">
+              {error}
+            </Text>
+          )}
+
           <Button
             variant="solid"
             fullWidth
@@ -84,7 +90,8 @@ export function PodSubmitPage() {
             disabled={photos.length === 0}
             onClick={handleSubmit}
           >
-            Submit POD ({photos.length} photo{photos.length !== 1 ? 's' : ''})
+            {uploadProgress ??
+              `Submit POD (${photos.length} photo${photos.length !== 1 ? 's' : ''})`}
           </Button>
         </div>
       </IonContent>
