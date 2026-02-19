@@ -60,7 +60,7 @@ function compressImage(file: File): Promise<CameraPhoto> {
           reader.readAsDataURL(compressedFile);
         },
         'image/jpeg',
-        QUALITY,
+        QUALITY
       );
     };
 

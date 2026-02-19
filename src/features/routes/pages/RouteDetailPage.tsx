@@ -1,6 +1,7 @@
 import { useParams } from 'react-router-dom';
 import { IonPage, IonContent, IonBackButton, IonButtons } from '@ionic/react';
 import { Header, Card, Skeleton } from '@/shared/ui';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { useRouteDetail } from '../hooks/use-route-detail';
 import { RouteDetailHeader } from '../components/RouteDetailHeader';
 import { RouteStopTimeline } from '../components/RouteStopTimeline';
@@ -14,12 +15,13 @@ export function RouteDetailPage() {
   return (
     <IonPage>
       <Header
-        title={route ? `Load #${route.internalIdentifier}` : 'Load Details'}
+        title={route?.internalIdentifier ? `Load #${route.internalIdentifier}` : 'Load Details'}
         leftContent={
           <IonButtons slot="start">
             <IonBackButton defaultHref="/tabs/loads" />
           </IonButtons>
         }
+        rightContent={<NotificationBell />}
       />
       <IonContent>
         <div className="route-detail-page">

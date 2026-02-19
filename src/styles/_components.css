@@ -139,6 +139,52 @@ ion-content {
   --background: var(--color-background-secondary);
 }
 
+/* Action Card */
+.action-card {
+  display: flex;
+  border-radius: var(--card-border-radius, 12px);
+  background: var(--card-background, var(--ion-card-background, #fff));
+  box-shadow: var(--card-shadow, var(--shadow-sm));
+  overflow: hidden;
+  cursor: pointer;
+  -webkit-tap-highlight-color: rgba(var(--color-primary-rgb, 124, 58, 237), 0.15);
+}
+
+.action-card__body {
+  flex: 1;
+  padding: var(--card-padding, var(--spacing-md));
+  min-width: 0;
+}
+
+.action-card__indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  flex-shrink: 0;
+  color: white;
+}
+
+.action-card__indicator--primary {
+  background: var(--color-primary, #7c3aed);
+}
+
+.action-card__indicator--success {
+  background: var(--color-success, #22c55e);
+}
+
+.action-card__indicator--warning {
+  background: var(--color-warning, #f59e0b);
+}
+
+.action-card__indicator--danger {
+  background: var(--color-danger, #ef4444);
+}
+
+.action-card__indicator--info {
+  background: var(--color-info, #3b82f6);
+}
+
 /* Card */
 ion-card {
   --background: var(--card-background);
@@ -1249,6 +1295,8 @@ ion-skeleton-text {
   font-size: var(--badge-font-size);
   font-weight: var(--font-weight-semibold);
   line-height: 1;
+  white-space: nowrap;
+  flex-shrink: 0;
   border-radius: var(--radius-full);
   background-color: var(--color-primary);
   color: var(--color-primary-contrast);

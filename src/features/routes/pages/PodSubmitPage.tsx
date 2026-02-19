@@ -3,6 +3,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { IonPage, IonContent, IonBackButton, IonButtons } from '@ionic/react';
 import { Camera, X } from 'lucide-react';
 import { Header, Card, Textarea, Button, Text } from '@/shared/ui';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { usePodSubmit } from '../hooks/use-pod-submit';
 import { useCamera, type CameraPhoto } from '@/shared/hooks/use-camera';
 
@@ -45,6 +46,7 @@ export function PodSubmitPage() {
             <IonBackButton defaultHref={`/tabs/loads/${routeId}/stops/${stopId}`} />
           </IonButtons>
         }
+        rightContent={<NotificationBell />}
       />
       <IonContent>
         <div className="pod-submit-page">

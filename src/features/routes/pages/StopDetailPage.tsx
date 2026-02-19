@@ -2,6 +2,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { IonPage, IonContent, IonBackButton, IonButtons } from '@ionic/react';
 import { Navigation, Camera, Clock, MapPin, FileText, Shield } from 'lucide-react';
 import { Header, Card, Text, Button, Badge } from '@/shared/ui';
+import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { formatDate } from '@/shared/utils';
 import { StopStatusBadge } from '../components/StopStatusBadge';
 import { useRouteDetail } from '../hooks/use-route-detail';
@@ -25,6 +26,7 @@ export function StopDetailPage() {
               <IonBackButton defaultHref={`/tabs/loads/${routeId}`} />
             </IonButtons>
           }
+          rightContent={<NotificationBell />}
         />
         <IonContent>
           <div className="stop-detail-page__empty">
@@ -64,6 +66,7 @@ export function StopDetailPage() {
             <IonBackButton defaultHref={`/tabs/loads/${routeId}`} />
           </IonButtons>
         }
+        rightContent={<NotificationBell />}
       />
       <IonContent>
         <div className="stop-detail-page">
@@ -80,7 +83,9 @@ export function StopDetailPage() {
             <div className="stop-detail-page__address">
               <MapPin size={16} />
               <Text size="sm" color="secondary">
-                {stop.facility?.address}, {stop.facility?.city}, {stop.facility?.state}
+                {[stop.facility?.address, stop.facility?.city, stop.facility?.state]
+                  .filter(Boolean)
+                  .join(', ') || 'Address not available'}
               </Text>
             </div>
 

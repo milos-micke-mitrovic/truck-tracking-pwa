@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { MapPin, Truck } from 'lucide-react';
 import { useHistory } from 'react-router-dom';
-import { Card, Text, EmptyState } from '@/shared/ui';
+import { ActionCard, Text, EmptyState } from '@/shared/ui';
 import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
 import { RouteStatusBadge } from '@/features/routes/components/RouteStatusBadge';
 import { RouteStatus } from '@/features/routes/types/route.types';
@@ -24,7 +24,7 @@ function ActiveDeliveryCard({ route }: { route: RouteShortResponse }) {
   };
 
   return (
-    <Card accent="warning" className="active-delivery" onClick={handleViewRoute}>
+    <ActionCard color="primary" className="active-delivery" onClick={handleViewRoute}>
       <div className="active-delivery__header">
         <div className="active-delivery__title-row">
           <Text weight="semibold">
@@ -40,7 +40,7 @@ function ActiveDeliveryCard({ route }: { route: RouteShortResponse }) {
         </div>
         <div className="active-delivery__address">
           <Text size="sm" weight="medium">
-            {route.originCity ?? '—'} &rarr; {route.destinationCity ?? '—'}
+            {route.originCity || 'TBD'} &rarr; {route.destinationCity || 'TBD'}
           </Text>
         </div>
       </div>
@@ -64,7 +64,7 @@ function ActiveDeliveryCard({ route }: { route: RouteShortResponse }) {
           </Text>
         </div>
       </div>
-    </Card>
+    </ActionCard>
   );
 }
 

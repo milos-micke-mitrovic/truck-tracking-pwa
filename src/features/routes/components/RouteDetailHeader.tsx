@@ -11,6 +11,14 @@ export function RouteDetailHeader({ route }: RouteDetailHeaderProps) {
   const firstStop = route.stops[0];
   const lastStop = route.stops[route.stops.length - 1];
 
+  const formatLocation = (facility: typeof firstStop.facility) => {
+    const parts = [facility?.city, facility?.state].filter(Boolean);
+    return parts.length > 0 ? parts.join(', ') : null;
+  };
+
+  const originLabel = firstStop ? formatLocation(firstStop.facility) : null;
+  const destLabel = lastStop ? formatLocation(lastStop.facility) : null;
+
   return (
     <Card className="route-detail-header">
       <div className="route-detail-header__top">
@@ -20,16 +28,16 @@ export function RouteDetailHeader({ route }: RouteDetailHeaderProps) {
         </Text>
       </div>
 
-      {firstStop && lastStop && (
+      {(originLabel || destLabel) && (
         <div className="route-detail-header__route">
           <Text size="sm" weight="medium">
-            {firstStop.facility?.city}, {firstStop.facility?.state}
+            {originLabel ?? 'TBD'}
           </Text>
           <Text size="sm" color="secondary">
             &rarr;
           </Text>
           <Text size="sm" weight="medium">
-            {lastStop.facility?.city}, {lastStop.facility?.state}
+            {destLabel ?? 'TBD'}
           </Text>
         </div>
       )}
@@ -62,7 +70,7 @@ export function RouteDetailHeader({ route }: RouteDetailHeaderProps) {
             <DollarSign size={20} />
           </div>
           <Text size="lg" weight="semibold">
-            ${route.driverRate?.toLocaleString() ?? '—'}
+            {route.driverRate != null ? `$${route.driverRate.toLocaleString()}` : 'N/A'}
           </Text>
           <Text size="xs" color="tertiary">
             rate

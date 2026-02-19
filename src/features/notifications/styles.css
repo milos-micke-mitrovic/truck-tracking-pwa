@@ -17,24 +17,7 @@
   margin-bottom: var(--spacing-xs);
 }
 
-/* Notification Card Sliding */
-.notification-card-sliding {
-  --background: transparent;
-  margin-bottom: 0;
-}
-
 /* Notification Card */
-.notification-card {
-  --padding-start: var(--spacing-md);
-  --padding-end: var(--spacing-md);
-  --padding-top: var(--spacing-sm);
-  --padding-bottom: var(--spacing-sm);
-  --inner-padding-end: 0;
-  --background: var(--card-background);
-  --border-radius: var(--card-border-radius);
-  cursor: pointer;
-}
-
 .notification-card--unread {
   border-left: 3px solid var(--color-primary);
 }

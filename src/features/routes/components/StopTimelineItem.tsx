@@ -1,6 +1,6 @@
 import { useHistory } from 'react-router-dom';
 import { MapPin, Clock, Navigation, Package, Truck } from 'lucide-react';
-import { Text, Button } from '@/shared/ui';
+import { Text, Button, ActionCard } from '@/shared/ui';
 import { formatDate } from '@/shared/utils';
 import { StopStatusBadge } from './StopStatusBadge';
 import { StopType, StopStatus } from '../types/route.types';
@@ -23,7 +23,9 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
         destination: {
           lat: stop.facility.latitude,
           lng: stop.facility.longitude,
-          address: `${stop.facility.address ?? ''}, ${stop.facility.city ?? ''}, ${stop.facility.state ?? ''}`,
+          address: [stop.facility.address, stop.facility.city, stop.facility.state]
+            .filter(Boolean)
+            .join(', '),
           customer: stop.facility.name,
         },
         navigationTimestamp: Date.now(),
@@ -36,10 +38,7 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
   };
 
   return (
-    <div
-      className={`stop-timeline-item ${isCompleted ? 'stop-timeline-item--completed' : ''}`}
-      onClick={handleTap}
-    >
+    <div className={`stop-timeline-item ${isCompleted ? 'stop-timeline-item--completed' : ''}`}>
       <div className="stop-timeline-item__indicator">
         <div
           className={`stop-timeline-item__dot stop-timeline-item__dot--${isPickup ? 'pickup' : 'delivery'}`}
@@ -48,7 +47,11 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
         </div>
       </div>
 
-      <div className="stop-timeline-item__content">
+      <ActionCard
+        color={isPickup ? 'warning' : 'primary'}
+        className="stop-timeline-item__content"
+        onClick={handleTap}
+      >
         <div className="stop-timeline-item__header">
           <div>
             <Text size="xs" color="tertiary" weight="medium">
@@ -61,12 +64,14 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
           <StopStatusBadge status={stop.status} />
         </div>
 
-        <div className="stop-timeline-item__location">
-          <MapPin size={14} />
-          <Text size="xs" color="secondary">
-            {stop.facility?.city}, {stop.facility?.state}
-          </Text>
-        </div>
+        {(stop.facility?.city || stop.facility?.state) && (
+          <div className="stop-timeline-item__location">
+            <MapPin size={14} />
+            <Text size="xs" color="secondary">
+              {[stop.facility.city, stop.facility.state].filter(Boolean).join(', ')}
+            </Text>
+          </div>
+        )}
 
         {(stop.arrivalStartDate || stop.arrivalEndDate) && (
           <div className="stop-timeline-item__appointment">
@@ -89,7 +94,7 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
             Navigate
           </Button>
         )}
-      </div>
+      </ActionCard>
     </div>
   );
 }

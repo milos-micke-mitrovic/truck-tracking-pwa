@@ -1,8 +1,6 @@
-import { useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import { IonItemSliding, IonItem, IonItemOptions, IonItemOption } from '@ionic/react';
 import { Truck, FileCheck, FileX, XCircle, RefreshCw, Info } from 'lucide-react';
-import { Text } from '@/shared/ui';
+import { ActionCard, Text } from '@/shared/ui';
 import { formatRelativeDate } from '@/shared/utils';
 import { cn } from '@/shared/utils';
 import { NotificationType, ReferenceType } from '../types/notification.types';
@@ -34,9 +32,7 @@ const iconColorMap: Record<NotificationType, string> = {
 
 export function NotificationCard({ notification }: NotificationCardProps) {
   const history = useHistory();
-  const slidingRef = useRef<HTMLIonItemSlidingElement>(null);
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
-  const removeNotification = useNotificationsStore((state) => state.removeNotification);
 
   const Icon = iconMap[notification.type];
 
@@ -58,49 +54,31 @@ export function NotificationCard({ notification }: NotificationCardProps) {
     }
   };
 
-  const handleDelete = () => {
-    removeNotification(notification.id);
-    notificationsApi
-      .deleteNotification(notification.id, notification.recipientDriverId)
-      .catch(() => {});
-    void slidingRef.current?.close();
-  };
-
   return (
-    <IonItemSliding ref={slidingRef} className="notification-card-sliding">
-      <IonItem
-        lines="none"
-        button
-        detail={false}
-        onClick={handleClick}
-        className={cn('notification-card', !notification.read && 'notification-card--unread')}
-      >
-        <div className="notification-card__content">
-          <div className={cn('notification-card__icon', iconColorMap[notification.type])}>
-            <Icon size={18} />
-          </div>
-          <div className="notification-card__body">
-            <div className="notification-card__header">
-              <Text size="sm" weight="medium">
-                {notification.title}
-              </Text>
-              {!notification.read && <span className="notification-card__dot" />}
-            </div>
-            <Text size="xs" color="secondary" className="notification-card__message">
-              {notification.body}
-            </Text>
-            <Text size="xs" color="tertiary">
-              {formatRelativeDate(notification.createdAt)}
-            </Text>
-          </div>
+    <ActionCard
+      color="primary"
+      className={cn('notification-card', !notification.read && 'notification-card--unread')}
+      onClick={handleClick}
+    >
+      <div className="notification-card__content">
+        <div className={cn('notification-card__icon', iconColorMap[notification.type])}>
+          <Icon size={18} />
         </div>
-      </IonItem>
-
-      <IonItemOptions side="end">
-        <IonItemOption color="danger" onClick={handleDelete}>
-          Delete
-        </IonItemOption>
-      </IonItemOptions>
-    </IonItemSliding>
+        <div className="notification-card__body">
+          <div className="notification-card__header">
+            <Text size="sm" weight="medium">
+              {notification.title}
+            </Text>
+            {!notification.read && <span className="notification-card__dot" />}
+          </div>
+          <Text size="xs" color="secondary" className="notification-card__message">
+            {notification.body}
+          </Text>
+          <Text size="xs" color="tertiary">
+            {formatRelativeDate(notification.createdAt)}
+          </Text>
+        </div>
+      </div>
+    </ActionCard>
   );
 }
