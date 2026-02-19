@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/shared/stores';
 import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
+import { useNotificationsStore } from '@/features/notifications/stores/use-notifications-store';
 import { sseService } from '@/shared/services/sse.service';
 import { RouteStatus, mapRouteResponseToShort } from '@/features/routes/types/route.types';
 import type { RouteResponse, SseEventPayload } from '@/features/routes/types/route.types';
+import type { NotificationResponse } from '@/features/notifications/types/notification.types';
+import { ReferenceType } from '@/features/notifications/types/notification.types';
 
 type ToastVariant = 'success' | 'info' | 'warning' | 'error';
 
@@ -18,6 +21,8 @@ export function useSSE() {
   const token = useAuthStore((state) => state.token);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const { addRoute, updateRouteStatus } = useRoutesStore();
+  const incrementUnreadCount = useNotificationsStore((state) => state.incrementUnreadCount);
+  const addNotification = useNotificationsStore((state) => state.addNotification);
   const [toast, setToast] = useState<SSEToast>({
     isOpen: false,
     message: '',
@@ -30,6 +35,24 @@ export function useSSE() {
       setToast({ isOpen: true, message, variant });
     }
   };
+
+  const buildNotification = (
+    payload: SseEventPayload,
+    referenceType: ReferenceType | null
+  ): NotificationResponse => ({
+    id: -Date.now(),
+    tenantId: Number(user!.tenantId),
+    recipientDriverId: Number(user!.driverId),
+    type: payload.type as NotificationResponse['type'],
+    channel: 'SSE',
+    title: payload.title,
+    body: payload.body,
+    referenceId: payload.referenceId,
+    referenceType,
+    read: false,
+    createdAt: payload.timestamp,
+    readAt: null,
+  });
 
   useEffect(() => {
     if (!isAuthenticated || !user?.tenantId || !user?.driverId) {
@@ -46,6 +69,8 @@ export function useSSE() {
         const shortRoute = mapRouteResponseToShort(routeData);
         addRoute(shortRoute);
       }
+      addNotification(buildNotification(payload, ReferenceType.ROUTE));
+      incrementUnreadCount();
       showToast(payload, 'success');
     });
 
@@ -56,6 +81,8 @@ export function useSSE() {
       if (routeData && routeData.id && routeData.status) {
         updateRouteStatus(routeData.id, routeData.status);
       }
+      addNotification(buildNotification(payload, ReferenceType.ROUTE));
+      incrementUnreadCount();
       showToast(payload, 'info');
     });
 
@@ -66,22 +93,33 @@ export function useSSE() {
       if (routeId) {
         updateRouteStatus(routeId, RouteStatus.CANCELLED);
       }
+      addNotification(buildNotification(payload, ReferenceType.ROUTE));
+      incrementUnreadCount();
       showToast(payload, 'warning');
     });
 
     // POD_APPROVED
     const unsubPodApproved = sseService.on('POD_APPROVED', (raw) => {
-      showToast(raw as SseEventPayload, 'success');
+      const payload = raw as SseEventPayload;
+      addNotification(buildNotification(payload, ReferenceType.POD));
+      incrementUnreadCount();
+      showToast(payload, 'success');
     });
 
     // POD_REJECTED
     const unsubPodRejected = sseService.on('POD_REJECTED', (raw) => {
-      showToast(raw as SseEventPayload, 'error');
+      const payload = raw as SseEventPayload;
+      addNotification(buildNotification(payload, ReferenceType.POD));
+      incrementUnreadCount();
+      showToast(payload, 'error');
     });
 
     // SYSTEM
     const unsubSystem = sseService.on('SYSTEM', (raw) => {
-      showToast(raw as SseEventPayload, 'info');
+      const payload = raw as SseEventPayload;
+      addNotification(buildNotification(payload, null));
+      incrementUnreadCount();
+      showToast(payload, 'info');
     });
 
     // Auto-reconnect when the app returns to foreground or network recovers

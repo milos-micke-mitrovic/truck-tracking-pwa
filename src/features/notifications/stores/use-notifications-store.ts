@@ -15,6 +15,7 @@ interface NotificationsState {
   removeNotification: (id: number) => void;
   clearNotifications: () => void;
   setUnreadCount: (count: number) => void;
+  incrementUnreadCount: () => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
@@ -72,6 +73,8 @@ export const useNotificationsStore = create<NotificationsState>()(
       clearNotifications: () => set({ notifications: [], unreadCount: 0 }),
 
       setUnreadCount: (unreadCount) => set({ unreadCount }),
+
+      incrementUnreadCount: () => set((state) => ({ unreadCount: state.unreadCount + 1 })),
 
       setLoading: (isLoading) => set({ isLoading }),
 

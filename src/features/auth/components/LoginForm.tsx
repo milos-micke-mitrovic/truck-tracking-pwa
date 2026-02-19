@@ -25,6 +25,9 @@ export function LoginForm() {
     clearError();
     try {
       await login(data);
+      if ('Notification' in window && Notification.permission === 'default') {
+        await Notification.requestPermission();
+      }
       router.push('/tabs/home', 'root', 'replace');
     } catch {
       // Error is handled by the hook and shown via Toast
