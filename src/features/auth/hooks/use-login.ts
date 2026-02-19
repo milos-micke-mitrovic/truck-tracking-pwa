@@ -2,7 +2,6 @@ import { useState, useCallback } from 'react';
 import { useAuthStore } from '@/shared/stores';
 import { apiClient } from '@/shared/api';
 import { decodeJwtPayload } from '@/shared/utils';
-import { registerPushNotifications } from '@/shared/services/push.service';
 import type { LoginCredentials, AuthResponse, AuthError } from '../types/auth.types';
 
 interface UseLoginReturn {
@@ -42,9 +41,6 @@ export function useLogin(): UseLoginReturn {
         };
 
         setAuth(user, data.accessToken, data.refreshToken, data.expiresIn);
-
-        // Register push notifications (non-blocking)
-        void registerPushNotifications(user.driverId);
       } catch (err) {
         const message = err instanceof Error ? err.message : 'An unexpected error occurred';
         setError({ message });

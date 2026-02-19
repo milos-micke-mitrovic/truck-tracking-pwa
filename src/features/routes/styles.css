@@ -150,7 +150,9 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) 0;
   cursor: pointer;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    opacity 0.15s ease;
 }
 
 .stop-timeline-item:active {
@@ -196,7 +198,6 @@
   align-items: flex-start;
   margin-bottom: var(--spacing-xs);
 }
-
 
 .stop-timeline-item__location,
 .stop-timeline-item__appointment {
@@ -360,7 +361,9 @@
   cursor: pointer;
   background: transparent;
   color: var(--color-text-secondary);
-  transition: border-color 0.15s ease, background 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background 0.15s ease;
 }
 
 .pod-photo-gallery__add:active {

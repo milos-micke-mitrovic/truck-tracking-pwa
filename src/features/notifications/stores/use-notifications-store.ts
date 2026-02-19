@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { NotificationResponse } from '../types/notification.types';
+import { NotificationType } from '../types/notification.types';
 
 interface NotificationsState {
   notifications: NotificationResponse[];
@@ -13,6 +14,7 @@ interface NotificationsState {
   markAsRead: (id: number) => void;
   markAllAsRead: () => void;
   removeNotification: (id: number) => void;
+  removeByReferenceId: (referenceId: number, type: NotificationType) => void;
   clearNotifications: () => void;
   setUnreadCount: (count: number) => void;
   incrementUnreadCount: () => void;
@@ -67,6 +69,20 @@ export const useNotificationsStore = create<NotificationsState>()(
               notification && !notification.read
                 ? Math.max(0, state.unreadCount - 1)
                 : state.unreadCount,
+          };
+        }),
+
+      removeByReferenceId: (referenceId, type) =>
+        set((state) => {
+          const removed = state.notifications.filter(
+            (n) => n.referenceId === referenceId && n.type === type
+          );
+          const unreadRemoved = removed.filter((n) => !n.read).length;
+          return {
+            notifications: state.notifications.filter(
+              (n) => !(n.referenceId === referenceId && n.type === type)
+            ),
+            unreadCount: Math.max(0, state.unreadCount - unreadRemoved),
           };
         }),
 

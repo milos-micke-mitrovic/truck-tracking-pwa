@@ -1,6 +1,7 @@
 import { IonPage, IonContent, useIonRouter } from '@ionic/react';
 import { Header, Card, Button, Avatar, Heading, Text, Switch, Skeleton } from '@/shared/ui';
 import { useAuthStore } from '@/shared/stores';
+import { apiClient } from '@/shared/api';
 import { useTheme } from '@/shared/hooks';
 import { useProfile } from '../hooks/use-profile';
 import { formatDate } from '@/shared/utils';
@@ -13,6 +14,12 @@ export function ProfilePage() {
   const { driver, vehicle, trailer, isLoading } = useProfile();
 
   const handleLogout = () => {
+    const refreshToken = useAuthStore.getState().refreshToken;
+    apiClient
+      .post('/auth/driver/logout', {
+        body: refreshToken ? { refreshToken } : undefined,
+      })
+      .catch(() => {});
     logout();
     router.push('/login', 'root', 'replace');
   };
