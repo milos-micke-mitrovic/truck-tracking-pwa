@@ -3,10 +3,11 @@ import { useAuthStore } from '@/shared/stores';
 import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
 import { useNotificationsStore } from '@/features/notifications/stores/use-notifications-store';
 import { sseService } from '@/shared/services/sse.service';
+import { registerPushNotifications } from '@/shared/services/push.service';
 import { RouteStatus, mapRouteResponseToShort } from '@/features/routes/types/route.types';
 import type { RouteResponse, SseEventPayload } from '@/features/routes/types/route.types';
 import type { NotificationResponse } from '@/features/notifications/types/notification.types';
-import { ReferenceType } from '@/features/notifications/types/notification.types';
+import { ReferenceType, NotificationType } from '@/features/notifications/types/notification.types';
 
 type ToastVariant = 'success' | 'info' | 'warning' | 'error';
 
@@ -23,6 +24,7 @@ export function useSSE() {
   const { addRoute, updateRouteStatus } = useRoutesStore();
   const incrementUnreadCount = useNotificationsStore((state) => state.incrementUnreadCount);
   const addNotification = useNotificationsStore((state) => state.addNotification);
+  const removeByReferenceId = useNotificationsStore((state) => state.removeByReferenceId);
   const [toast, setToast] = useState<SSEToast>({
     isOpen: false,
     message: '',
@@ -61,6 +63,9 @@ export function useSSE() {
 
     sseService.connect(user.tenantId, user.driverId, token || undefined);
 
+    // Re-register push subscription each session in case backend lost it
+    void registerPushNotifications(user.driverId);
+
     // ROUTE_ASSIGNED — backend sends SseEventPayload<RouteResponse>
     const unsubAssigned = sseService.on('ROUTE_ASSIGNED', (raw) => {
       const payload = raw as SseEventPayload<RouteResponse>;
@@ -92,6 +97,8 @@ export function useSSE() {
       const routeId = payload.referenceId;
       if (routeId) {
         updateRouteStatus(routeId, RouteStatus.CANCELLED);
+        // Remove the now-stale ROUTE_ASSIGNED notification for this route
+        removeByReferenceId(routeId, NotificationType.ROUTE_ASSIGNED);
       }
       addNotification(buildNotification(payload, ReferenceType.ROUTE));
       incrementUnreadCount();

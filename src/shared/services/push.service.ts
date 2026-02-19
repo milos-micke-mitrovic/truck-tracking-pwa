@@ -1,8 +1,5 @@
 import { apiClient } from '@/shared/api';
 
-const PUSH_ENABLED = import.meta.env.VITE_PUSH_ENABLED === 'true';
-const VAPID_KEY = import.meta.env.VITE_PUSH_VAPID_KEY || '';
-
 function urlBase64ToUint8Array(base64String: string): Uint8Array {
   const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
@@ -14,30 +11,43 @@ function urlBase64ToUint8Array(base64String: string): Uint8Array {
   return outputArray;
 }
 
-export async function registerPushNotifications(driverId: string): Promise<void> {
-  if (!PUSH_ENABLED || !VAPID_KEY) return;
+async function sendSubscriptionToBackend(
+  driverId: number | string,
+  subscription: PushSubscription
+): Promise<void> {
+  const json = subscription.toJSON();
+  await apiClient.post(`/push/subscribe/${driverId}`, {
+    body: {
+      endpoint: json.endpoint,
+      p256dhKey: json.keys?.p256dh,
+      authKey: json.keys?.auth,
+    },
+  });
+}
+
+export async function registerPushNotifications(driverId: number | string): Promise<void> {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
 
   try {
     const registration = await navigator.serviceWorker.ready;
     const existing = await registration.pushManager.getSubscription();
 
     if (existing) {
-      // Already subscribed
+      await sendSubscriptionToBackend(driverId, existing);
       return;
     }
 
+    // Fetch VAPID public key from backend
+    const { publicKey } = await apiClient.get<{ publicKey: string }>('/push/vapid-public-key');
+    if (!publicKey) return; // Backend hasn't configured VAPID keys yet
+
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_KEY).buffer as ArrayBuffer,
+      applicationServerKey: urlBase64ToUint8Array(publicKey).buffer as ArrayBuffer,
     });
 
-    await apiClient.post('/push/subscribe', {
-      body: {
-        driverId,
-        subscription: subscription.toJSON(),
-      },
-    });
+    await sendSubscriptionToBackend(driverId, subscription);
   } catch {
     // Push registration is non-critical, silently fail
   }
