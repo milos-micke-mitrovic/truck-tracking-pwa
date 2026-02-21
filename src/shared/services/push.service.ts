@@ -26,30 +26,45 @@ async function sendSubscriptionToBackend(
 }
 
 export async function registerPushNotifications(driverId: number | string): Promise<void> {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    console.warn('[Push] Service Worker or PushManager not supported');
+    return;
+  }
+  if (!('Notification' in window) || Notification.permission !== 'granted') {
+    console.warn('[Push] Notification permission not granted:', Notification.permission);
+    return;
+  }
 
   try {
+    console.log('[Push] Waiting for service worker ready...');
     const registration = await navigator.serviceWorker.ready;
     const existing = await registration.pushManager.getSubscription();
 
     if (existing) {
+      console.log('[Push] Re-sending existing subscription to backend');
       await sendSubscriptionToBackend(driverId, existing);
+      console.log('[Push] Subscription sent successfully');
       return;
     }
 
-    // Fetch VAPID public key from backend
+    console.log('[Push] No existing subscription, fetching VAPID key...');
     const { publicKey } = await apiClient.get<{ publicKey: string }>('/push/vapid-public-key');
-    if (!publicKey) return; // Backend hasn't configured VAPID keys yet
+    if (!publicKey) {
+      console.warn('[Push] Backend returned no VAPID public key');
+      return;
+    }
+    console.log('[Push] Got VAPID key, subscribing...');
 
     const subscription = await registration.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(publicKey).buffer as ArrayBuffer,
     });
+    console.log('[Push] Subscribed, sending to backend...');
 
     await sendSubscriptionToBackend(driverId, subscription);
-  } catch {
-    // Push registration is non-critical, silently fail
+    console.log('[Push] Registration complete');
+  } catch (err) {
+    console.error('[Push] Registration failed:', err);
   }
 }
 

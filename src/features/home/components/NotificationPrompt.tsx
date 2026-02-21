@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Bell, X } from 'lucide-react';
 import { Text } from '@/shared/ui';
 import { useAuthStore } from '@/shared/stores';
@@ -23,6 +23,13 @@ export function NotificationPrompt() {
     if (isDismissedThisSession()) return false;
     return true;
   });
+
+  // If permission was already granted (e.g. iOS prompted first), register silently
+  useEffect(() => {
+    if (isNotificationSupported() && Notification.permission === 'granted' && user?.driverId) {
+      void registerPushNotifications(user.driverId);
+    }
+  }, [user?.driverId]);
 
   if (!visible) return null;
 
