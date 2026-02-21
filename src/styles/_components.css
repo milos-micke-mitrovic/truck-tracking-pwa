@@ -617,6 +617,12 @@ ion-skeleton-text {
   gap: var(--spacing-md);
 }
 
+.active-delivery-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
 /* ================================
    Notification Prompt
    ================================ */
