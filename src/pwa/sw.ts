@@ -26,3 +26,55 @@ self.addEventListener('message', (event) => {
     void self.skipWaiting();
   }
 });
+
+// Handle incoming push notifications from backend
+self.addEventListener('push', (event: PushEvent) => {
+  if (!event.data) return;
+
+  let data: Record<string, unknown>;
+  try {
+    data = event.data.json() as Record<string, unknown>;
+  } catch {
+    data = { title: 'Truck Drive', body: event.data.text() };
+  }
+
+  const title = (data.title as string) ?? 'Truck Drive';
+  const notifData = (data.data ?? {}) as Record<string, string>;
+  const options: NotificationOptions & { renotify?: boolean } = {
+    body: (data.body as string) ?? '',
+    icon: '/pwa-192x192.png',
+    badge: '/pwa-192x192.png',
+    data: notifData,
+    tag: notifData?.type ?? 'default',
+    renotify: true,
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+// Handle notification click — focus or open the app
+self.addEventListener('notificationclick', (event: NotificationEvent) => {
+  event.notification.close();
+
+  const notifData = event.notification.data as Record<string, string> | undefined;
+
+  // Route based on notification type
+  let url = '/tabs/home';
+  if (notifData?.type === 'ROUTE_ASSIGNED' || notifData?.type === 'ROUTE_UPDATED') {
+    url = '/tabs/loads';
+  }
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      // Try to focus and navigate an existing window
+      for (const client of clients) {
+        if (client.url.includes(self.registration.scope) && 'focus' in client) {
+          void client.navigate(url);
+          return client.focus();
+        }
+      }
+      // No existing window — open new one
+      return self.clients.openWindow(url);
+    })
+  );
+});
