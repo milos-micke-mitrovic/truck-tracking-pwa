@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Bell, X } from 'lucide-react';
 import { Text } from '@/shared/ui';
+import { useAuthStore } from '@/shared/stores';
+import { registerPushNotifications } from '@/shared/services/push.service';
 
 const DISMISSED_KEY = 'notification-prompt-dismissed';
 
@@ -13,6 +15,8 @@ function isNotificationSupported(): boolean {
 }
 
 export function NotificationPrompt() {
+  const user = useAuthStore((state) => state.user);
+
   const [visible, setVisible] = useState(() => {
     if (!isNotificationSupported()) return false;
     if (Notification.permission !== 'default') return false;
@@ -24,8 +28,8 @@ export function NotificationPrompt() {
 
   const handleAllow = async () => {
     const result = await Notification.requestPermission();
-    if (result === 'granted') {
-      // TODO: Subscribe to push and send subscription to BE
+    if (result === 'granted' && user?.driverId) {
+      await registerPushNotifications(user.driverId);
     }
     setVisible(false);
   };
