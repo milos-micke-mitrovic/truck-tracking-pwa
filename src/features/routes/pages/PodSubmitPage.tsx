@@ -6,12 +6,16 @@ import { Header, Card, Textarea, Button, Text } from '@/shared/ui';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { usePodSubmit } from '../hooks/use-pod-submit';
 import { useCamera, type CameraPhoto } from '@/shared/hooks/use-camera';
+import { routesApi } from '../api/routes.api';
+import { useRoutesStore } from '../stores/use-routes-store';
+import { mapRouteResponseToShort } from '../types/route.types';
 
 export function PodSubmitPage() {
   const { id: routeId, stopId } = useParams<{ id: string; stopId: string }>();
   const history = useHistory();
   const { submitPod, isLoading, error, uploadProgress } = usePodSubmit();
   const { takePhoto } = useCamera();
+  const { setActiveRoute, updateRouteInList } = useRoutesStore();
   const [photos, setPhotos] = useState<CameraPhoto[]>([]);
   const [notes, setNotes] = useState('');
 
@@ -31,6 +35,20 @@ export function PodSubmitPage() {
 
     try {
       await submitPod(stopId, photos, notes || undefined);
+
+      // Refetch route to get updated status & completedAt from backend
+      try {
+        const updatedRoute = await routesApi.getRoute(routeId);
+        setActiveRoute(updatedRoute);
+        const shortRoute = mapRouteResponseToShort(updatedRoute);
+        updateRouteInList(updatedRoute.id, {
+          status: shortRoute.status,
+          completedAt: shortRoute.completedAt,
+        });
+      } catch {
+        // Non-critical — route will update on next list fetch
+      }
+
       history.goBack();
     } catch {
       // Error handled by hook

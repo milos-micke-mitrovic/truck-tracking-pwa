@@ -189,6 +189,7 @@ export interface RouteShortResponse {
   dispatcherName: string | null;
   status: RouteStatus;
   bookedAt: string | null;
+  completedAt: string | null;
   createdAt: string;
 }
 
@@ -360,6 +361,7 @@ export function mapRouteResponseToShort(route: RouteResponse): RouteShortRespons
     dispatcherName: route.dispatcher?.name ?? null,
     status: route.status,
     bookedAt: route.bookedAt ?? null,
+    completedAt: route.completedAt ?? null,
     createdAt: route.createdAt,
   };
 }

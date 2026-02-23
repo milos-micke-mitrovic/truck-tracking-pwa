@@ -14,7 +14,6 @@ const ACTIVE_STATUSES = new Set([
   RouteStatus.AT_PICKUP,
   RouteStatus.LOADED,
   RouteStatus.AT_DELIVERY,
-  RouteStatus.DELIVERED,
 ]);
 
 export function RoutesListPage() {
@@ -26,7 +25,12 @@ export function RoutesListPage() {
       return routes.filter((r) => ACTIVE_STATUSES.has(r.status));
     }
     return routes.filter(
-      (r) => r.status === RouteStatus.COMPLETED || r.status === RouteStatus.CANCELLED
+      (r) =>
+        r.status === RouteStatus.DELIVERED ||
+        r.status === RouteStatus.COMPLETED ||
+        r.status === RouteStatus.INVOICED ||
+        r.status === RouteStatus.PAID ||
+        r.status === RouteStatus.CANCELLED
     );
   }, [routes, filter]);
 

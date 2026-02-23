@@ -19,7 +19,6 @@ const ACTIVE_STATUSES = new Set([
   RouteStatus.AT_PICKUP,
   RouteStatus.LOADED,
   RouteStatus.AT_DELIVERY,
-  RouteStatus.DELIVERED,
 ]);
 
 export function QuickActions() {
