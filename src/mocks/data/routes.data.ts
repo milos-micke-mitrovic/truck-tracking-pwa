@@ -266,6 +266,7 @@ export const mockRoutesShort: RouteShortResponse[] = [
     status: RouteStatus.IN_TRANSIT,
     bookedAt: '2025-06-13T14:30:00Z',
     createdAt: '2025-06-13T14:30:00Z',
+    completedAt: null,
   },
   {
     id: 2,
@@ -286,6 +287,7 @@ export const mockRoutesShort: RouteShortResponse[] = [
     status: RouteStatus.DISPATCHED,
     bookedAt: '2025-06-14T10:00:00Z',
     createdAt: '2025-06-14T10:00:00Z',
+    completedAt: null,
   },
   {
     id: 3,
@@ -306,6 +308,7 @@ export const mockRoutesShort: RouteShortResponse[] = [
     status: RouteStatus.COMPLETED,
     bookedAt: '2025-06-10T09:00:00Z',
     createdAt: '2025-06-10T09:00:00Z',
+    completedAt: '2025-06-12T15:00:00Z',
   },
   {
     id: 4,
@@ -326,6 +329,7 @@ export const mockRoutesShort: RouteShortResponse[] = [
     status: RouteStatus.AT_DELIVERY,
     bookedAt: '2025-06-12T16:00:00Z',
     createdAt: '2025-06-12T16:00:00Z',
+    completedAt: null,
   },
 ];
 

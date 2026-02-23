@@ -11,7 +11,6 @@ const ACTIVE_STATUSES = new Set([
   RouteStatus.AT_PICKUP,
   RouteStatus.LOADED,
   RouteStatus.AT_DELIVERY,
-  RouteStatus.DELIVERED,
 ]);
 
 interface StatItem {
@@ -25,7 +24,13 @@ export function QuickStats() {
 
   const stats = useMemo<StatItem[]>(() => {
     const activeCount = routes.filter((r) => ACTIVE_STATUSES.has(r.status)).length;
-    const completedCount = routes.filter((r) => r.status === RouteStatus.COMPLETED).length;
+    const completedCount = routes.filter(
+      (r) =>
+        r.status === RouteStatus.DELIVERED ||
+        r.status === RouteStatus.COMPLETED ||
+        r.status === RouteStatus.INVOICED ||
+        r.status === RouteStatus.PAID
+    ).length;
     const totalMiles = routes.reduce((sum, r) => sum + (r.totalMiles ?? 0), 0);
     const totalLoads = routes.length;
 
