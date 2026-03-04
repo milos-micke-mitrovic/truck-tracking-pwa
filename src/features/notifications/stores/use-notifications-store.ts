@@ -30,12 +30,38 @@ export const useNotificationsStore = create<NotificationsState>()(
       isLoading: false,
       error: null,
 
-      setNotifications: (notifications) => set({ notifications }),
+      setNotifications: (incoming) =>
+        set((state) => {
+          const locallyReadIds = new Set(
+            state.notifications.filter((n) => n.read).map((n) => n.id)
+          );
+          const merged = incoming.map((n) =>
+            locallyReadIds.has(n.id)
+              ? { ...n, read: true, readAt: n.readAt ?? new Date().toISOString() }
+              : n
+          );
+          return {
+            notifications: merged,
+            unreadCount: merged.filter((n) => !n.read).length,
+          };
+        }),
 
-      appendNotifications: (notifications) =>
-        set((state) => ({
-          notifications: [...state.notifications, ...notifications],
-        })),
+      appendNotifications: (incoming) =>
+        set((state) => {
+          const locallyReadIds = new Set(
+            state.notifications.filter((n) => n.read).map((n) => n.id)
+          );
+          const mergedIncoming = incoming.map((n) =>
+            locallyReadIds.has(n.id)
+              ? { ...n, read: true, readAt: n.readAt ?? new Date().toISOString() }
+              : n
+          );
+          const combined = [...state.notifications, ...mergedIncoming];
+          return {
+            notifications: combined,
+            unreadCount: combined.filter((n) => !n.read).length,
+          };
+        }),
 
       addNotification: (notification) =>
         set((state) => ({
