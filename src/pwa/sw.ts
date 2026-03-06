@@ -8,6 +8,12 @@ interface SkipWaitingMessage {
   type: 'SKIP_WAITING';
 }
 
+interface PushNotifData {
+  type?: string;
+  referenceId?: number | string;
+  referenceType?: string;
+}
+
 // Clean up old caches
 cleanupOutdatedCaches();
 
@@ -27,6 +33,22 @@ self.addEventListener('message', (event) => {
   }
 });
 
+function resolveUrl(notifData: PushNotifData): string {
+  const refId = notifData.referenceId;
+  switch (notifData.type) {
+    case 'ROUTE_ASSIGNED':
+    case 'ROUTE_UPDATED':
+      return refId ? `/tabs/loads/${refId}` : '/tabs/loads';
+    case 'ROUTE_CANCELLED':
+      return '/tabs/loads';
+    case 'POD_APPROVED':
+    case 'POD_REJECTED':
+      return refId ? `/tabs/loads/${refId}` : '/tabs/loads';
+    default:
+      return '/tabs/home';
+  }
+}
+
 // Handle incoming push notifications from backend
 self.addEventListener('push', (event: PushEvent) => {
   if (!event.data) return;
@@ -39,30 +61,44 @@ self.addEventListener('push', (event: PushEvent) => {
   }
 
   const title = (data.title as string) ?? 'Truck Drive';
-  const notifData = (data.data ?? {}) as Record<string, string>;
-  const options: NotificationOptions & { renotify?: boolean } = {
+  const notifData = (data.data ?? {}) as PushNotifData;
+
+  // Build action buttons based on notification type
+  const actions: { action: string; title: string }[] = [];
+  if (notifData.type === 'ROUTE_ASSIGNED' || notifData.type === 'ROUTE_UPDATED') {
+    actions.push({ action: 'view', title: 'View Route' });
+  } else if (notifData.type === 'POD_REJECTED') {
+    actions.push({ action: 'resubmit', title: 'Resubmit POD' });
+  } else if (notifData.type === 'POD_APPROVED') {
+    actions.push({ action: 'view', title: 'View Details' });
+  }
+
+  const options: NotificationOptions & { renotify?: boolean; actions?: typeof actions } = {
     body: (data.body as string) ?? '',
     icon: '/pwa-192x192.png',
     badge: '/pwa-192x192.png',
     data: notifData,
     tag: notifData?.type ?? 'default',
     renotify: true,
+    actions,
   };
 
-  event.waitUntil(self.registration.showNotification(title, options));
+  event.waitUntil(
+    self.registration.showNotification(title, options).then(() => {
+      // Increment app badge for unread notifications
+      if ('setAppBadge' in self.navigator) {
+        void (self.navigator as Navigator & { setAppBadge: () => Promise<void> }).setAppBadge();
+      }
+    })
+  );
 });
 
 // Handle notification click — focus or open the app
 self.addEventListener('notificationclick', (event: NotificationEvent) => {
   event.notification.close();
 
-  const notifData = event.notification.data as Record<string, string> | undefined;
-
-  // Route based on notification type
-  let url = '/tabs/home';
-  if (notifData?.type === 'ROUTE_ASSIGNED' || notifData?.type === 'ROUTE_UPDATED') {
-    url = '/tabs/loads';
-  }
+  const notifData = event.notification.data as PushNotifData | undefined;
+  const url = resolveUrl(notifData ?? {});
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {

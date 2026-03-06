@@ -7,10 +7,12 @@ import {
   IonRouterOutlet,
   IonFab,
   IonFabButton,
+  IonToast,
+  IonAlert,
   iosTransitionAnimation,
 } from '@ionic/react';
 import { Route, Redirect, useHistory } from 'react-router-dom';
-import { home, person, navigate, cube } from 'ionicons/icons';
+import { home, person, navigate, cube, cloudOfflineOutline } from 'ionicons/icons';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { MapPage } from '@/features/map/pages/MapPage';
 import { ProfilePage } from '@/features/profile';
@@ -24,7 +26,7 @@ import { useSSE } from '@/shared/hooks/use-sse';
 import { Toast } from '@/shared/ui';
 
 export function TabsLayout() {
-  const { toast, dismissToast } = useSSE();
+  const { toast, dismissToast, routeAlert, dismissRouteAlert, isConnected } = useSSE();
   const history = useHistory();
 
   const handleMapClick = () => {
@@ -83,12 +85,79 @@ export function TabsLayout() {
         </IonFabButton>
       </IonFab>
 
-      <Toast
-        isOpen={toast.isOpen}
-        message={toast.message}
-        variant={toast.variant}
-        duration={4000}
-        onDidDismiss={dismissToast}
+      {/* SSE offline banner — shown when real-time connection is lost */}
+      <IonToast
+        isOpen={isConnected === false}
+        message="Reconnecting to live updates..."
+        position="top"
+        color="warning"
+        icon={cloudOfflineOutline}
+        className="toast"
+      />
+
+      {/* SSE event toast — with optional action button (e.g. POD_REJECTED "View Route") */}
+      {toast.actionLabel && toast.onAction ? (
+        <IonToast
+          isOpen={toast.isOpen}
+          message={toast.message}
+          duration={6000}
+          position="top"
+          color={
+            toast.variant === 'error'
+              ? 'danger'
+              : toast.variant === 'success'
+                ? 'success'
+                : toast.variant === 'warning'
+                  ? 'warning'
+                  : 'primary'
+          }
+          buttons={[
+            {
+              text: toast.actionLabel,
+              handler: () => {
+                toast.onAction?.();
+                dismissToast();
+              },
+            },
+            { role: 'cancel', text: 'Dismiss', handler: dismissToast },
+          ]}
+          onDidDismiss={dismissToast}
+          className="toast"
+        />
+      ) : (
+        <Toast
+          isOpen={toast.isOpen}
+          message={toast.message}
+          variant={toast.variant}
+          duration={4000}
+          onDidDismiss={dismissToast}
+        />
+      )}
+
+      {/* ROUTE_ASSIGNED alert — prominent prompt when a new route arrives while app is open */}
+      <IonAlert
+        isOpen={routeAlert.isOpen}
+        header="New Route Assigned"
+        message={routeAlert.message}
+        buttons={[
+          {
+            text: 'View Route',
+            handler: () => {
+              if (routeAlert.routeId) {
+                history.push(`/tabs/loads/${routeAlert.routeId}`);
+              } else {
+                history.push('/tabs/loads');
+              }
+              dismissRouteAlert();
+            },
+          },
+          {
+            text: 'Later',
+            role: 'cancel',
+            handler: dismissRouteAlert,
+          },
+        ]}
+        onDidDismiss={dismissRouteAlert}
       />
     </AuthGuard>
   );
