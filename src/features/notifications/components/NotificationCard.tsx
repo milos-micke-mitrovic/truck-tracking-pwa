@@ -49,6 +49,8 @@ export function NotificationCard({ notification }: NotificationCardProps) {
           break;
         case ReferenceType.STOP:
         case ReferenceType.POD:
+          // referenceId holds the routeId for POD/STOP notifications
+          history.push(`/tabs/loads/${notification.referenceId}`);
           break;
       }
     }

@@ -16,6 +16,7 @@ const MAX_RECONNECT_DELAY_MS = 30_000;
 class SSEService {
   private eventSource: EventSource | null = null;
   private handlers = new Map<SSEEventType, Set<SSEHandler>>();
+  private statusListeners = new Set<(connected: boolean) => void>();
   private reconnectAttempts = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private tenantId: string | null = null;
@@ -24,6 +25,17 @@ class SSEService {
 
   get isConnected(): boolean {
     return this.eventSource?.readyState === EventSource.OPEN;
+  }
+
+  onStatusChange(listener: (connected: boolean) => void): () => void {
+    this.statusListeners.add(listener);
+    return () => this.statusListeners.delete(listener);
+  }
+
+  private notifyStatus(connected: boolean): void {
+    for (const listener of this.statusListeners) {
+      try { listener(connected); } catch { /* ignore */ }
+    }
   }
 
   connect(tenantId: string, driverId: string, token?: string): void {
@@ -91,11 +103,13 @@ class SSEService {
 
       this.eventSource.onopen = () => {
         this.reconnectAttempts = 0;
+        this.notifyStatus(true);
       };
 
       this.eventSource.onerror = () => {
         this.eventSource?.close();
         this.eventSource = null;
+        this.notifyStatus(false);
         this.scheduleReconnect();
       };
 
