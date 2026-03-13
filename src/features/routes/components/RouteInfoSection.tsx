@@ -12,7 +12,7 @@ export function RouteInfoSection({ route }: RouteInfoSectionProps) {
         <div className="route-info-section__rows">
           {route.dispatcher && <InfoRow label="Dispatcher" value={route.dispatcher.name} />}
           {route.broker && (
-            <InfoRow label="Broker" value={route.broker.legalName || route.broker.dbaName || '—'} />
+            <InfoRow label="Broker" value={route.broker.name || '—'} />
           )}
           {route.brokerIdentifier && <InfoRow label="Broker ID" value={route.brokerIdentifier} />}
           {route.vehicle && <InfoRow label="Vehicle" value={route.vehicle.unitId} />}
