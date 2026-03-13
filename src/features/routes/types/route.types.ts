@@ -146,9 +146,8 @@ export interface VehicleShort {
 
 export interface BrokerShort {
   id: number;
+  name: string | null;
   mcNumber: string;
-  legalName: string | null;
-  dbaName: string | null;
 }
 
 export interface UserShort {
