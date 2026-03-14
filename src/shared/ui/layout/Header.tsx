@@ -20,7 +20,7 @@ export function Header({
   return (
     <IonHeader className={cn('header', rounded && 'header-rounded', className)}>
       <IonToolbar>
-        {leftContent && <IonButtons slot="start">{leftContent}</IonButtons>}
+        {leftContent}
         <IonTitle>{title}</IonTitle>
         {rightContent && <IonButtons slot="end">{rightContent}</IonButtons>}
       </IonToolbar>

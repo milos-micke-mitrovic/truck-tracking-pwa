@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { MapPin, Truck } from 'lucide-react';
-import { useHistory } from 'react-router-dom';
+import { useIonRouter } from '@ionic/react';
 import { ActionCard, Text, EmptyState } from '@/shared/ui';
 import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
 import { RouteStatusBadge } from '@/features/routes/components/RouteStatusBadge';
@@ -17,10 +17,10 @@ const ACTIVE_STATUSES = new Set([
 ]);
 
 function ActiveDeliveryCard({ route }: { route: RouteShortResponse }) {
-  const history = useHistory();
+  const router = useIonRouter();
 
   const handleViewRoute = () => {
-    history.push(`/tabs/loads/${route.id}`);
+    router.push(`/tabs/loads/${route.id}`, 'forward', 'push');
   };
 
   return (
@@ -28,7 +28,7 @@ function ActiveDeliveryCard({ route }: { route: RouteShortResponse }) {
       <div className="active-delivery__header">
         <div className="active-delivery__title-row">
           <Text weight="semibold">
-            {route.brokerIdentifier ?? route.internalIdentifier ?? 'Load'}
+            {route.brokerIdentifier || route.internalIdentifier || 'Load'}
           </Text>
           <RouteStatusBadge status={route.status} />
         </div>
@@ -40,7 +40,8 @@ function ActiveDeliveryCard({ route }: { route: RouteShortResponse }) {
         </div>
         <div className="active-delivery__address">
           <Text size="sm" weight="medium">
-            {route.originCity || 'TBD'} &rarr; {route.destinationCity || 'TBD'}
+            {route.originCity || 'Origin pending'}
+            {route.destinationCity ? ` → ${route.destinationCity}` : ''}
           </Text>
         </div>
       </div>
@@ -76,6 +77,7 @@ export function ActiveDelivery() {
   if (activeRoutes.length === 0) {
     return (
       <EmptyState
+        icon={<Truck size={48} />}
         title="No active loads"
         description="You have no loads in progress. Check the Loads tab for upcoming loads."
       />

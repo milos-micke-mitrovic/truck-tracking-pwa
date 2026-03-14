@@ -1,7 +1,13 @@
-import { Truck, MapPin, DollarSign } from 'lucide-react';
-import { Card, Text } from '@/shared/ui';
+import { Truck, MapPin, DollarSign, Clock } from 'lucide-react';
+import { Badge, Card, Text } from '@/shared/ui';
 import { RouteStatusBadge } from './RouteStatusBadge';
 import type { RouteResponse } from '../types/route.types';
+
+const formatRouteType = (type: string): string =>
+  type
+    .split('_')
+    .map((w) => w.charAt(0) + w.slice(1).toLowerCase())
+    .join(' ');
 
 interface RouteDetailHeaderProps {
   route: RouteResponse;
@@ -23,22 +29,28 @@ export function RouteDetailHeader({ route }: RouteDetailHeaderProps) {
     <Card className="route-detail-header">
       <div className="route-detail-header__top">
         <RouteStatusBadge status={route.status} />
+        {route.autoDispatched && <Badge variant="info">Auto</Badge>}
         <Text size="xs" color="tertiary">
           {route.internalIdentifier}
+          {route.routeType && ` · ${formatRouteType(route.routeType)}`}
         </Text>
       </div>
 
-      {(originLabel || destLabel) && (
+      {originLabel && (
         <div className="route-detail-header__route">
           <Text size="sm" weight="medium">
-            {originLabel ?? 'TBD'}
+            {originLabel}
           </Text>
-          <Text size="sm" color="secondary">
-            &rarr;
-          </Text>
-          <Text size="sm" weight="medium">
-            {destLabel ?? 'TBD'}
-          </Text>
+          {destLabel && (
+            <>
+              <Text size="sm" color="secondary">
+                &rarr;
+              </Text>
+              <Text size="sm" weight="medium">
+                {destLabel}
+              </Text>
+            </>
+          )}
         </div>
       )}
 
@@ -76,6 +88,19 @@ export function RouteDetailHeader({ route }: RouteDetailHeaderProps) {
             rate
           </Text>
         </div>
+        {route.estimatedDuration && (
+          <div className="route-detail-header__stat">
+            <div className="route-detail-header__stat-icon">
+              <Clock size={20} />
+            </div>
+            <Text size="lg" weight="semibold">
+              {route.estimatedDuration}
+            </Text>
+            <Text size="xs" color="tertiary">
+              duration
+            </Text>
+          </div>
+        )}
       </div>
     </Card>
   );

@@ -13,7 +13,11 @@ export function NotificationBell() {
 
   return (
     <div className="notification-bell">
-      <IconButton icon={<Bell size={22} />} aria-label="Notifications" onClick={handleClick} />
+      <IconButton
+        icon={<Bell size={22} />}
+        aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
+        onClick={handleClick}
+      />
       {unreadCount > 0 && (
         <span className="notification-bell__badge">{unreadCount > 99 ? '99+' : unreadCount}</span>
       )}

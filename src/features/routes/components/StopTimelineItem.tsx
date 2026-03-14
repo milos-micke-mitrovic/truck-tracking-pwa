@@ -1,3 +1,4 @@
+import { useIonRouter } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
 import { MapPin, Clock, Navigation, Package, Truck } from 'lucide-react';
 import { Text, Button, ActionCard } from '@/shared/ui';
@@ -12,6 +13,7 @@ interface StopTimelineItemProps {
 }
 
 export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
+  const router = useIonRouter();
   const history = useHistory();
   const isPickup = stop.type === StopType.PICKUP;
   const isCompleted = stop.status === StopStatus.COMPLETED;
@@ -23,7 +25,7 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
         destination: {
           lat: stop.facility.latitude,
           lng: stop.facility.longitude,
-          address: [stop.facility.address, stop.facility.city, stop.facility.state]
+          address: [stop.facility.street, stop.facility.city, stop.facility.state]
             .filter(Boolean)
             .join(', '),
           customer: stop.facility.name,
@@ -34,7 +36,7 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
   };
 
   const handleTap = () => {
-    history.push(`/tabs/loads/${routeId}/stops/${stop.id}`);
+    router.push(`/tabs/loads/${routeId}/stops/${stop.id}`, 'forward', 'push');
   };
 
   return (
@@ -58,7 +60,7 @@ export function StopTimelineItem({ stop, routeId }: StopTimelineItemProps) {
               {isPickup ? 'PICKUP' : 'DELIVERY'} #{stop.stopOrder + 1}
             </Text>
             <Text size="sm" weight="semibold">
-              {stop.facility?.name ?? 'Unknown Facility'}
+              {stop.facility?.name || stop.facility?.city || 'Pending'}
             </Text>
           </div>
           <StopStatusBadge status={stop.status} />

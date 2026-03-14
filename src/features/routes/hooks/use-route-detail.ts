@@ -4,52 +4,44 @@ import { useRoutesStore } from '../stores/use-routes-store';
 import type { RouteResponse } from '../types/route.types';
 
 export function useRouteDetail(routeId: string | undefined) {
-  const { activeRoute, setActiveRoute } = useRoutesStore();
+  const activeRoute = useRoutesStore((s) => s.activeRoute);
+  const setActiveRoute = useRoutesStore((s) => s.setActiveRoute);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRoute = useCallback(async () => {
-    if (!routeId) return;
+  const isCached = routeId != null && String(activeRoute?.id) === routeId;
 
-    if (String(activeRoute?.id) === routeId) {
-      return;
-    }
+  const fetchRoute = useCallback(
+    async (force = false) => {
+      if (!routeId) return;
+      if (!force && isCached) return;
 
-    setIsLoading(true);
-    setError(null);
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const route = await routesApi.getRoute(routeId);
-      setActiveRoute(route);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load route';
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [routeId, activeRoute?.id, setActiveRoute]);
+      try {
+        const route = await routesApi.getRoute(routeId);
+        setActiveRoute(route);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load route';
+        setError(message);
+      } finally {
+        setIsLoading(false);
+      }
+    },
+    [routeId, isCached, setActiveRoute]
+  );
 
   const refresh = useCallback(async () => {
-    if (!routeId) return;
-    setIsLoading(true);
-    setError(null);
-    try {
-      const route = await routesApi.getRoute(routeId);
-      setActiveRoute(route);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load route';
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [routeId, setActiveRoute]);
+    await fetchRoute(true);
+  }, [fetchRoute]);
 
   useEffect(() => {
     void fetchRoute();
   }, [fetchRoute]);
 
   return {
-    route: String(activeRoute?.id) === routeId ? activeRoute : null,
+    route: isCached ? activeRoute : null,
     isLoading,
     error,
     refresh,

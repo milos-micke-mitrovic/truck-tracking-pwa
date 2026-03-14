@@ -160,12 +160,12 @@ export interface UserShort {
 export interface FacilityShort {
   id: number;
   name: string;
-  facilityType: FacilityType;
+  facilityType?: FacilityType;
   city: string | null;
   state: string | null;
-  address: string | null;
-  latitude: number | null;
-  longitude: number | null;
+  street: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
 }
 
 // --- Route List DTO ---

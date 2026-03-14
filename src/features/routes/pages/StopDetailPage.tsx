@@ -1,20 +1,151 @@
+import { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { IonPage, IonContent, IonBackButton, IonButtons } from '@ionic/react';
-import { Navigation, Camera, Clock, MapPin, FileText, Shield } from 'lucide-react';
-import { Header, Card, Text, Button, Badge } from '@/shared/ui';
+import {
+  IonPage,
+  IonContent,
+  IonBackButton,
+  IonButtons,
+  IonRefresher,
+  IonRefresherContent,
+  useIonRouter,
+} from '@ionic/react';
+import { Navigation, Camera, Clock, MapPin, FileText, Shield, CheckCircle } from 'lucide-react';
+import { Header, Card, Text, Button, Badge, ActionSheet, Toast, Skeleton } from '@/shared/ui';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
-import { formatDate } from '@/shared/utils';
+import { formatDate, hapticSuccess, hapticError, copyToClipboard } from '@/shared/utils';
 import { StopStatusBadge } from '../components/StopStatusBadge';
 import { useRouteDetail } from '../hooks/use-route-detail';
-import { StopType } from '../types/route.types';
+import { useRouteActions } from '../hooks/use-route-actions';
+import { StopType, StopStatus } from '../types/route.types';
 import type { RouteStopResponse } from '../types/route.types';
+
+const PICKUP_FLOW: StopStatus[] = [
+  StopStatus.PENDING,
+  StopStatus.EN_ROUTE,
+  StopStatus.ARRIVED,
+  StopStatus.LOADING,
+  StopStatus.DEPARTED,
+  StopStatus.COMPLETED,
+];
+
+const DELIVERY_FLOW: StopStatus[] = [
+  StopStatus.PENDING,
+  StopStatus.EN_ROUTE,
+  StopStatus.ARRIVED,
+  StopStatus.UNLOADING,
+  StopStatus.DEPARTED,
+  StopStatus.COMPLETED,
+];
+
+const STATUS_LABELS: Record<string, string> = {
+  [StopStatus.EN_ROUTE]: 'En Route',
+  [StopStatus.ARRIVED]: 'Mark Arrived',
+  [StopStatus.LOADING]: 'Start Loading',
+  [StopStatus.UNLOADING]: 'Start Unloading',
+  [StopStatus.DEPARTED]: 'Depart',
+  [StopStatus.COMPLETED]: 'Complete Stop',
+};
+
+function getNextStatus(
+  currentStatus: StopStatus | null | undefined,
+  stopType: StopType
+): StopStatus | null {
+  const flow = stopType === StopType.PICKUP ? PICKUP_FLOW : DELIVERY_FLOW;
+
+  if (!currentStatus) {
+    return StopStatus.EN_ROUTE;
+  }
+
+  const currentIndex = flow.indexOf(currentStatus);
+  if (currentIndex === -1 || currentIndex >= flow.length - 1) {
+    return null;
+  }
+
+  return flow[currentIndex + 1];
+}
+
+function formatAccessory(acc: string): string {
+  return acc
+    .split('_')
+    .map((word) => word.charAt(0) + word.slice(1).toLowerCase())
+    .join(' ');
+}
+
+function CopyableRefRow({ type, value }: { type: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    void copyToClipboard(value).then((ok) => {
+      if (ok) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }
+    });
+  };
+
+  return (
+    <div className="stop-detail-page__ref-row" onClick={handleCopy} style={{ cursor: 'pointer' }}>
+      <Text as="span" size="sm" color="secondary">
+        {type}
+      </Text>
+      <Text as="span" size="sm" weight="medium" color={copied ? 'success' : undefined}>
+        {copied ? 'Copied!' : value}
+      </Text>
+    </div>
+  );
+}
 
 export function StopDetailPage() {
   const { id: routeId, stopId } = useParams<{ id: string; stopId: string }>();
   const history = useHistory();
-  const { route } = useRouteDetail(routeId);
+  const router = useIonRouter();
+  const { route, refresh } = useRouteDetail(routeId);
+  const { updateStopStatus, isLoading: isUpdating } = useRouteActions();
+
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<StopStatus | null>(null);
+  const [toastMessage, setToastMessage] = useState('');
+  const [showErrorToast, setShowErrorToast] = useState(false);
+  const [addressCopied, setAddressCopied] = useState(false);
 
   const stop: RouteStopResponse | undefined = route?.stops.find((s) => String(s.id) === stopId);
+
+  if (!route) {
+    return (
+      <IonPage>
+        <Header
+          title="Stop Details"
+          leftContent={
+            <IonButtons slot="start">
+              <IonBackButton defaultHref={`/tabs/loads/${routeId}`} />
+            </IonButtons>
+          }
+          rightContent={<NotificationBell />}
+        />
+        <IonContent>
+          <div className="stop-detail-page">
+            <Card>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
+                <Skeleton width={80} height={24} variant="rectangular" />
+                <Skeleton width={70} height={24} variant="rectangular" />
+              </div>
+              <Skeleton width="70%" height={20} />
+              <div style={{ marginTop: 8 }}>
+                <Skeleton width="90%" height={14} />
+              </div>
+            </Card>
+            <Skeleton width="100%" height={44} variant="rectangular" />
+            <Card>
+              <Skeleton width="40%" height={16} />
+              <div style={{ marginTop: 12 }}>
+                <Skeleton width="100%" height={14} />
+              </div>
+            </Card>
+          </div>
+        </IonContent>
+      </IonPage>
+    );
+  }
 
   if (!stop) {
     return (
@@ -38,6 +169,29 @@ export function StopDetailPage() {
   }
 
   const isDelivery = stop.type === StopType.DELIVERY;
+  const nextStatus = getNextStatus(stop.status as StopStatus | null, stop.type);
+
+  const handleStatusAction = () => {
+    if (!nextStatus) return;
+    setPendingStatus(nextStatus);
+    setShowConfirm(true);
+  };
+
+  const handleConfirmStatus = () => {
+    if (!pendingStatus) return;
+    const statusToSet = pendingStatus;
+    setPendingStatus(null);
+    setShowConfirm(false);
+    updateStopStatus(Number(routeId), Number(stopId), statusToSet)
+      .then(() => {
+        hapticSuccess();
+      })
+      .catch(() => {
+        hapticError();
+        setToastMessage('Failed to update stop status. Please try again.');
+        setShowErrorToast(true);
+      });
+  };
 
   const handleNavigate = () => {
     if (stop.facility?.latitude && stop.facility?.longitude) {
@@ -45,7 +199,7 @@ export function StopDetailPage() {
         destination: {
           lat: stop.facility.latitude,
           lng: stop.facility.longitude,
-          address: `${stop.facility.address ?? ''}, ${stop.facility.city ?? ''}, ${stop.facility.state ?? ''}`,
+          address: `${stop.facility.street ?? ''}, ${stop.facility.city ?? ''}, ${stop.facility.state ?? ''}`,
           customer: stop.facility.name,
         },
         navigationTimestamp: Date.now(),
@@ -54,7 +208,7 @@ export function StopDetailPage() {
   };
 
   const handleSubmitPod = () => {
-    history.push(`/tabs/loads/${routeId}/stops/${stopId}/pod`);
+    router.push(`/tabs/loads/${routeId}/stops/${stopId}/pod`, 'forward', 'push');
   };
 
   return (
@@ -69,6 +223,14 @@ export function StopDetailPage() {
         rightContent={<NotificationBell />}
       />
       <IonContent>
+        <IonRefresher
+          slot="fixed"
+          onIonRefresh={(e) => {
+            void refresh().then(() => e.detail.complete());
+          }}
+        >
+          <IonRefresherContent />
+        </IonRefresher>
         <div className="stop-detail-page">
           <Card className="stop-detail-page__header-card">
             <div className="stop-detail-page__type-row">
@@ -77,17 +239,37 @@ export function StopDetailPage() {
             </div>
 
             <Text size="lg" weight="semibold">
-              {stop.facility?.name ?? 'Unknown Facility'}
+              {stop.facility?.name || stop.facility?.city || 'Facility pending'}
             </Text>
 
-            <div className="stop-detail-page__address">
-              <MapPin size={16} />
-              <Text size="sm" color="secondary">
-                {[stop.facility?.address, stop.facility?.city, stop.facility?.state]
-                  .filter(Boolean)
-                  .join(', ') || 'Address not available'}
-              </Text>
-            </div>
+            {stop.facility && (
+              <div
+                className="stop-detail-page__address"
+                style={{ cursor: 'pointer' }}
+                onClick={() => {
+                  const address = [stop.facility!.street, stop.facility!.city, stop.facility!.state]
+                    .filter(Boolean)
+                    .join(', ');
+                  if (address) {
+                    void copyToClipboard(address).then((ok) => {
+                      if (ok) {
+                        setAddressCopied(true);
+                        setTimeout(() => setAddressCopied(false), 1500);
+                      }
+                    });
+                  }
+                }}
+              >
+                <MapPin size={16} />
+                <Text size="sm" color={addressCopied ? 'success' : 'secondary'}>
+                  {addressCopied
+                    ? 'Copied!'
+                    : [stop.facility.street, stop.facility.city, stop.facility.state]
+                        .filter(Boolean)
+                        .join(', ') || 'Address not available'}
+                </Text>
+              </div>
+            )}
 
             {(stop.arrivalStartDate || stop.arrivalEndDate) && (
               <div className="stop-detail-page__appointment">
@@ -95,6 +277,24 @@ export function StopDetailPage() {
                 <Text size="sm" color="secondary">
                   {stop.arrivalStartDate && formatDate(stop.arrivalStartDate, 'MMM d, h:mm a')}
                   {stop.arrivalEndDate && ` - ${formatDate(stop.arrivalEndDate, 'h:mm a')}`}
+                </Text>
+              </div>
+            )}
+
+            {stop.actualArrivalDate && (
+              <div className="stop-detail-page__appointment">
+                <CheckCircle size={16} color="var(--color-success, #22c55e)" />
+                <Text size="sm" color="secondary">
+                  Arrived: {formatDate(stop.actualArrivalDate, 'MMM d, h:mm a')}
+                </Text>
+              </div>
+            )}
+
+            {stop.actualDepartureDate && (
+              <div className="stop-detail-page__appointment">
+                <CheckCircle size={16} color="var(--color-success, #22c55e)" />
+                <Text size="sm" color="secondary">
+                  Departed: {formatDate(stop.actualDepartureDate, 'MMM d, h:mm a')}
                 </Text>
               </div>
             )}
@@ -114,20 +314,19 @@ export function StopDetailPage() {
                 Submit POD
               </Button>
             )}
+
+            {nextStatus && (
+              <Button variant="solid" fullWidth onClick={handleStatusAction} disabled={isUpdating}>
+                {STATUS_LABELS[nextStatus]}
+              </Button>
+            )}
           </div>
 
           {stop.referenceNumbers.length > 0 && (
             <Card title="Reference Numbers" className="stop-detail-page__card">
               <div className="stop-detail-page__refs">
                 {stop.referenceNumbers.map((ref) => (
-                  <div key={ref.id} className="stop-detail-page__ref-row">
-                    <Text as="span" size="sm" color="secondary">
-                      {ref.type}
-                    </Text>
-                    <Text as="span" size="sm" weight="medium">
-                      {ref.value}
-                    </Text>
-                  </div>
+                  <CopyableRefRow key={ref.id} type={ref.type} value={ref.value} />
                 ))}
               </div>
             </Card>
@@ -139,7 +338,7 @@ export function StopDetailPage() {
                 {stop.accessories.map((acc) => (
                   <Badge key={acc} variant="outline">
                     <Shield size={12} />
-                    {acc.replace(/_/g, ' ')}
+                    {formatAccessory(acc)}
                   </Badge>
                 ))}
               </div>
@@ -152,12 +351,41 @@ export function StopDetailPage() {
                 {stop.requiredDocuments.map((doc) => (
                   <div key={doc} className="stop-detail-page__doc-row">
                     <FileText size={14} />
-                    <Text size="sm">{doc.replace(/_/g, ' ')}</Text>
+                    <Text size="sm">{formatAccessory(doc)}</Text>
                   </div>
                 ))}
               </div>
             </Card>
           )}
+          <ActionSheet
+            isOpen={showConfirm}
+            onClose={() => {
+              setShowConfirm(false);
+              setPendingStatus(null);
+            }}
+            header="Update Stop Status"
+            subHeader={
+              pendingStatus ? `Set status to "${STATUS_LABELS[pendingStatus]}"?` : undefined
+            }
+            buttons={[
+              {
+                text: pendingStatus ? STATUS_LABELS[pendingStatus] : 'Confirm',
+                handler: handleConfirmStatus,
+              },
+              {
+                text: 'Cancel',
+                role: 'cancel',
+              },
+            ]}
+          />
+
+          <Toast
+            isOpen={showErrorToast}
+            message={toastMessage}
+            variant="error"
+            duration={3000}
+            onDidDismiss={() => setShowErrorToast(false)}
+          />
         </div>
       </IonContent>
     </IonPage>

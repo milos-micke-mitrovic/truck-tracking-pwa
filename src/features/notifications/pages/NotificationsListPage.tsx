@@ -5,9 +5,9 @@ import {
   IonInfiniteScroll,
   IonInfiniteScrollContent,
 } from '@ionic/react';
-import { MoreVertical } from 'lucide-react';
+import { MoreVertical, Bell } from 'lucide-react';
 import { PageLayout } from '@/shared/components';
-import { IconButton, Skeleton, EmptyState, ActionSheet } from '@/shared/ui';
+import { IconButton, Skeleton, EmptyState, ActionSheet, Button } from '@/shared/ui';
 import type { ActionSheetButton } from '@/shared/ui';
 import { NotificationCard } from '../components/NotificationCard';
 import { NotificationsFilter, type NotificationFilterTab } from '../components/NotificationsFilter';
@@ -19,7 +19,7 @@ import { useAuthStore } from '@/shared/stores';
 export function NotificationsListPage() {
   const [filter, setFilter] = useState<NotificationFilterTab>('all');
   const [showActions, setShowActions] = useState(false);
-  const { notifications, isLoading, hasMore, refresh, loadMore } = useNotifications();
+  const { notifications, isLoading, error, hasMore, refresh, loadMore } = useNotifications();
   const { unreadCount, markAllAsRead, clearNotifications } = useNotificationsStore();
   const user = useAuthStore((state) => state.user);
 
@@ -81,9 +81,25 @@ export function NotificationsListPage() {
       onRefresh={refresh}
     >
       <div className="notifications-list-page">
-        <NotificationsFilter value={filter} onChange={setFilter} />
+        <NotificationsFilter
+          value={filter}
+          onChange={(newFilter: NotificationFilterTab) => {
+            setFilter(newFilter);
+            void document
+              .querySelector('.notifications-list-page')
+              ?.closest('ion-content')
+              ?.scrollToTop(300);
+          }}
+        />
 
-        {isLoading && !notifications.length ? (
+        {error && !notifications.length ? (
+          <div className="notifications-list-page__error">
+            <p>{error}</p>
+            <Button variant="outline" size="small" onClick={refresh}>
+              Retry
+            </Button>
+          </div>
+        ) : isLoading && !notifications.length ? (
           <div className="notifications-list-page__list">
             {Array.from({ length: 4 }).map((_, i) => (
               <NotificationCardSkeleton key={i} />
@@ -91,6 +107,7 @@ export function NotificationsListPage() {
           </div>
         ) : filteredNotifications.length === 0 ? (
           <EmptyState
+            icon={<Bell size={48} />}
             title={filter === 'unread' ? 'No unread notifications' : 'No notifications'}
             description={
               filter === 'unread'

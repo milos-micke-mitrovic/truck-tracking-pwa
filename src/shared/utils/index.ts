@@ -6,3 +6,9 @@ export { formatDate, formatRelativeDate, formatTime, formatDateTime } from './fo
 
 // JWT utilities
 export { decodeJwtPayload, type JwtPayload } from './jwt';
+
+// Haptic feedback utilities
+export * from './haptics';
+
+// Clipboard utilities
+export * from './clipboard';

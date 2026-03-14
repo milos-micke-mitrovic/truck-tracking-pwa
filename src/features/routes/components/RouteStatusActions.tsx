@@ -1,5 +1,6 @@
 import { Button, ActionSheet, Toast } from '@/shared/ui';
 import { useState } from 'react';
+import { hapticSuccess, hapticError } from '@/shared/utils';
 import { RouteStatus } from '../types/route.types';
 import { useRouteActions } from '../hooks/use-route-actions';
 
@@ -53,7 +54,9 @@ export function RouteStatusActions({ routeId, status }: RouteStatusActionsProps)
     setPendingTransition(null);
     try {
       await changeRouteStatus(routeId, transition.nextStatus);
+      hapticSuccess();
     } catch {
+      hapticError();
       setShowError(true);
     }
   };

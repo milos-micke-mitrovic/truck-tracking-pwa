@@ -797,7 +797,7 @@ ion-skeleton-text {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 }
 
 .active-delivery__title-row {
@@ -808,11 +808,11 @@ ion-skeleton-text {
 
 .active-delivery__destination {
   display: flex;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
+  gap: var(--spacing-xs);
+  padding: var(--spacing-xs);
   background: var(--color-background-secondary);
   border-radius: var(--radius-md);
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-xs);
 }
 
 .active-delivery__icon {
@@ -830,7 +830,6 @@ ion-skeleton-text {
 .active-delivery__stats {
   display: flex;
   gap: var(--spacing-lg);
-  margin-bottom: var(--spacing-md);
 }
 
 .active-delivery__stat {
@@ -1514,18 +1513,12 @@ ion-fab[horizontal='center'] {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: var(--spacing-2);
-  padding: var(--spacing-2) var(--spacing-4);
-  background-color: var(--color-warning);
-  color: var(--color-warning-contrast);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-medium);
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: var(--z-index-toast);
-  padding-top: calc(var(--spacing-2) + var(--safe-area-top));
+  gap: 8px;
+  padding: 8px 16px;
+  background: var(--color-warning, #f59e0b);
+  color: #1a1a2e;
+  font-size: 13px;
+  font-weight: 500;
 }
 
 /* ================================
@@ -1852,4 +1845,74 @@ ion-popover.select-popover ion-radio {
 
 .picker-modal ion-datetime {
   --background: var(--color-background);
+}
+
+/* ================================
+   Route Assigned Alert
+   ================================ */
+.route-assigned-alert {
+  --backdrop-opacity: 0.7;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.route-assigned-alert .alert-wrapper {
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  max-width: 320px;
+}
+
+.route-assigned-alert .alert-head {
+  background: var(--color-primary, #7c3aed);
+  padding: 18px 20px;
+}
+
+.route-assigned-alert .alert-title {
+  color: #fff;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.route-assigned-alert .alert-message {
+  padding: 20px;
+  font-size: 15px;
+  color: var(--color-text-primary) !important;
+  line-height: 1.5;
+}
+
+.route-assigned-alert .alert-button-group {
+  padding: 8px 16px 16px;
+  gap: 8px;
+}
+
+.route-assigned-alert .route-assigned-alert__view-btn {
+  background: var(--color-primary, #7c3aed);
+  color: #fff !important;
+  border-radius: 10px;
+  font-weight: 600;
+  padding: 10px 16px;
+}
+
+.route-assigned-alert .alert-button-role-cancel {
+  color: var(--color-text-secondary) !important;
+  font-weight: 500;
+}
+
+/* Tab Badge */
+.tab-badge {
+  position: absolute;
+  top: 4px;
+  right: 20%;
+  min-width: 18px;
+  height: 18px;
+  border-radius: 9px;
+  background: var(--color-primary);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
 }

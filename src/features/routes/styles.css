@@ -6,10 +6,68 @@
   gap: var(--spacing-md);
 }
 
+.routes-list-page__error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
+}
+
 .routes-list-page__list {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+}
+
+/* Routes Search */
+.routes-search {
+  position: relative;
+  margin-bottom: var(--spacing-xs);
+}
+
+.routes-search__icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+.routes-search__clear {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+}
+
+.routes-search__input {
+  width: 100%;
+  padding: 10px 36px 10px 36px;
+  border-radius: 10px;
+  border: 1.5px solid var(--color-border);
+  background: var(--color-background-secondary, var(--ion-card-background));
+  color: var(--color-text-primary);
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+}
+
+.routes-search__input:focus {
+  border-color: var(--color-primary);
+}
+
+.routes-search__input::placeholder {
+  color: var(--color-text-tertiary);
 }
 
 /* Routes Filter */
@@ -65,12 +123,20 @@
   gap: var(--spacing-md);
 }
 
-.route-detail-page__loading,
-.route-detail-page__error {
+.route-detail-page__loading {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: var(--spacing-xl);
+}
+
+.route-detail-page__error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
 }
 
 /* Route Detail Header */
@@ -131,22 +197,58 @@
 .route-stop-timeline {
   display: flex;
   flex-direction: column;
-  position: relative;
 }
 
-.route-stop-timeline::before {
+/* Line connecting dots — each indicator draws lines up/down from its dot center */
+.stop-timeline-item__indicator {
+  position: relative;
+  z-index: 1;
+  flex-shrink: 0;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+}
+
+/* Line going down from dot center — extends past item boundary to cover gap */
+.stop-timeline-item__indicator::after {
   content: '';
   position: absolute;
-  left: 15px;
-  top: 24px;
-  bottom: 24px;
+  left: 50%;
+  top: 50%;
+  bottom: calc(-1 * var(--spacing-sm));
   width: 2px;
+  transform: translateX(-50%);
   background: var(--color-border);
+}
+
+/* Line going up to dot center — extends past item boundary to cover gap */
+.stop-timeline-item__indicator::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: calc(-1 * var(--spacing-sm));
+  bottom: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background: var(--color-border);
+}
+
+/* First item: no line going up */
+.route-stop-timeline > :first-child .stop-timeline-item__indicator::before {
+  display: none;
+}
+
+/* Last item: no line going down */
+.route-stop-timeline > :last-child .stop-timeline-item__indicator::after {
+  display: none;
 }
 
 /* Stop Timeline Item */
 .stop-timeline-item {
   display: flex;
+  align-items: center;
   gap: var(--spacing-sm);
   padding: var(--spacing-sm) 0;
   cursor: pointer;
@@ -164,13 +266,10 @@
   opacity: 0.7;
 }
 
-.stop-timeline-item__indicator {
-  position: relative;
-  z-index: 1;
-  flex-shrink: 0;
-}
 
 .stop-timeline-item__dot {
+  position: relative;
+  z-index: 2;
   width: 32px;
   height: 32px;
   border-radius: 50%;
@@ -227,8 +326,14 @@
 .route-info-section__row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  gap: var(--spacing-md);
   padding: var(--spacing-xs) 0;
+}
+
+.route-info-section__row > :last-child {
+  text-align: right;
+  word-break: break-word;
 }
 
 /* Stop Detail Page */

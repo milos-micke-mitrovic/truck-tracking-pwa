@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useParams, useHistory } from 'react-router-dom';
-import { IonPage, IonContent, IonBackButton, IonButtons } from '@ionic/react';
-import { Camera, X } from 'lucide-react';
-import { Header, Card, Textarea, Button, Text } from '@/shared/ui';
+import { IonPage, IonContent, IonButtons } from '@ionic/react';
+import { Camera, X, ChevronLeft } from 'lucide-react';
+import { Header, Card, Textarea, Button, Text, Alert } from '@/shared/ui';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { usePodSubmit } from '../hooks/use-pod-submit';
 import { useCamera, type CameraPhoto } from '@/shared/hooks/use-camera';
@@ -18,6 +18,22 @@ export function PodSubmitPage() {
   const { setActiveRoute, updateRouteInList } = useRoutesStore();
   const [photos, setPhotos] = useState<CameraPhoto[]>([]);
   const [notes, setNotes] = useState('');
+  const [showLeaveAlert, setShowLeaveAlert] = useState(false);
+
+  const hasUnsavedChanges = photos.length > 0;
+
+  const handleBack = () => {
+    if (hasUnsavedChanges) {
+      setShowLeaveAlert(true);
+    } else {
+      history.goBack();
+    }
+  };
+
+  const handleConfirmLeave = () => {
+    setShowLeaveAlert(false);
+    history.goBack();
+  };
 
   const handleAddPhoto = async () => {
     const photo = await takePhoto();
@@ -61,7 +77,20 @@ export function PodSubmitPage() {
         title="Submit POD"
         leftContent={
           <IonButtons slot="start">
-            <IonBackButton defaultHref={`/tabs/loads/${routeId}/stops/${stopId}`} />
+            <button
+              type="button"
+              onClick={handleBack}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                color: 'var(--ion-color-primary)',
+              }}
+            >
+              <ChevronLeft size={24} />
+            </button>
           </IonButtons>
         }
         rightContent={<NotificationBell />}
@@ -115,6 +144,17 @@ export function PodSubmitPage() {
           </Button>
         </div>
       </IonContent>
+
+      <Alert
+        isOpen={showLeaveAlert}
+        onClose={() => setShowLeaveAlert(false)}
+        header="Unsaved Photos"
+        message="You have photos that haven't been submitted. Are you sure you want to leave?"
+        buttons={[
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Leave', role: 'destructive', handler: handleConfirmLeave },
+        ]}
+      />
     </IonPage>
   );
 }

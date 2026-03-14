@@ -1,4 +1,4 @@
-import { useHistory } from 'react-router-dom';
+import { useIonRouter } from '@ionic/react';
 import { Truck, FileCheck, FileX, XCircle, RefreshCw, Info } from 'lucide-react';
 import { ActionCard, Text } from '@/shared/ui';
 import { formatRelativeDate } from '@/shared/utils';
@@ -31,7 +31,7 @@ const iconColorMap: Record<NotificationType, string> = {
 };
 
 export function NotificationCard({ notification }: NotificationCardProps) {
-  const history = useHistory();
+  const router = useIonRouter();
   const markAsRead = useNotificationsStore((state) => state.markAsRead);
 
   const Icon = iconMap[notification.type];
@@ -45,12 +45,12 @@ export function NotificationCard({ notification }: NotificationCardProps) {
     if (notification.referenceId && notification.referenceType) {
       switch (notification.referenceType) {
         case ReferenceType.ROUTE:
-          history.push(`/tabs/loads/${notification.referenceId}`);
+          router.push(`/tabs/loads/${notification.referenceId}`, 'forward', 'push');
           break;
         case ReferenceType.STOP:
         case ReferenceType.POD:
           // referenceId holds the routeId for POD/STOP notifications
-          history.push(`/tabs/loads/${notification.referenceId}`);
+          router.push(`/tabs/loads/${notification.referenceId}`, 'forward', 'push');
           break;
       }
     }

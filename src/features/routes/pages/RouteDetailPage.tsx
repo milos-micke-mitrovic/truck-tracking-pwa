@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { IonPage, IonContent, IonBackButton, IonButtons } from '@ionic/react';
-import { Header, Card, Skeleton } from '@/shared/ui';
+import { Header, Card, Skeleton, Button } from '@/shared/ui';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
 import { useRouteDetail } from '../hooks/use-route-detail';
 import { RouteDetailHeader } from '../components/RouteDetailHeader';
@@ -10,12 +10,12 @@ import { RouteInfoSection } from '../components/RouteInfoSection';
 
 export function RouteDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const { route, isLoading, error } = useRouteDetail(id);
+  const { route, isLoading, error, refresh } = useRouteDetail(id);
 
   return (
     <IonPage>
       <Header
-        title={route?.internalIdentifier ? `Load #${route.internalIdentifier}` : 'Load Details'}
+        title={route?.brokerIdentifier || route?.internalIdentifier || 'Load Details'}
         leftContent={
           <IonButtons slot="start">
             <IonBackButton defaultHref="/tabs/loads" />
@@ -30,6 +30,9 @@ export function RouteDetailPage() {
           {error && (
             <div className="route-detail-page__error">
               <p>{error}</p>
+              <Button variant="outline" size="small" onClick={refresh}>
+                Retry
+              </Button>
             </div>
           )}
 

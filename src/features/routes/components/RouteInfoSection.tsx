@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import { Card, Text } from '@/shared/ui';
+import { formatDate, copyToClipboard } from '@/shared/utils';
 import type { RouteResponse } from '../types/route.types';
 
 interface RouteInfoSectionProps {
@@ -6,45 +8,96 @@ interface RouteInfoSectionProps {
 }
 
 export function RouteInfoSection({ route }: RouteInfoSectionProps) {
+  const hasDispatchInfo =
+    route.dispatcher ||
+    route.broker ||
+    route.brokerIdentifier ||
+    route.brokerRepresentative ||
+    route.vehicle ||
+    route.bookedAt ||
+    route.dispatchedAt ||
+    route.completedAt;
+
+  const hasRouteInfo =
+    route.estimatedDuration || route.routeHighway || route.tolls != null || route.fuelCost != null;
+
+  const hasLoadDetails =
+    route.loadDetails &&
+    (route.loadDetails.commodity ||
+      route.loadDetails.weight ||
+      route.loadDetails.unitCount != null ||
+      route.loadDetails.capacity ||
+      route.loadDetails.lengthFeet ||
+      route.loadDetails.temperature);
+
+  if (!hasDispatchInfo && !hasRouteInfo && !hasLoadDetails) return null;
+
   return (
     <div className="route-info-section">
-      <Card title="Dispatch Info" className="route-info-section__card">
-        <div className="route-info-section__rows">
-          {route.dispatcher && <InfoRow label="Dispatcher" value={route.dispatcher.name} />}
-          {route.broker && (
-            <InfoRow label="Broker" value={route.broker.name || '—'} />
-          )}
-          {route.brokerIdentifier && <InfoRow label="Broker ID" value={route.brokerIdentifier} />}
-          {route.vehicle && <InfoRow label="Vehicle" value={route.vehicle.unitId} />}
-        </div>
-      </Card>
+      {hasDispatchInfo && (
+        <Card title="Dispatch Info" className="route-info-section__card">
+          <div className="route-info-section__rows">
+            {route.dispatcher && <InfoRow label="Dispatcher" value={route.dispatcher.name} />}
+            {route.broker && <InfoRow label="Broker" value={route.broker.name || '—'} />}
+            {route.brokerIdentifier && <InfoRow label="Broker ID" value={route.brokerIdentifier} />}
+            {route.brokerRepresentative && (
+              <InfoRow label="Broker Rep" value={route.brokerRepresentative} />
+            )}
+            {route.vehicle && <InfoRow label="Vehicle" value={route.vehicle.unitId} />}
+            {route.bookedAt && (
+              <InfoRow label="Booked" value={formatDate(route.bookedAt, 'MMM d, h:mm a')} />
+            )}
+            {route.dispatchedAt && (
+              <InfoRow label="Dispatched" value={formatDate(route.dispatchedAt, 'MMM d, h:mm a')} />
+            )}
+            {route.completedAt && (
+              <InfoRow label="Completed" value={formatDate(route.completedAt, 'MMM d, h:mm a')} />
+            )}
+          </div>
+        </Card>
+      )}
 
-      {route.loadDetails && (
+      {hasRouteInfo && (
+        <Card title="Route Info" className="route-info-section__card">
+          <div className="route-info-section__rows">
+            {route.estimatedDuration && (
+              <InfoRow label="Est. Duration" value={route.estimatedDuration} />
+            )}
+            {route.routeHighway && <InfoRow label="Highway" value={route.routeHighway} />}
+            {route.tolls != null && <InfoRow label="Tolls" value={`$${route.tolls.toFixed(2)}`} />}
+            {route.fuelCost != null && (
+              <InfoRow label="Fuel Cost" value={`$${route.fuelCost.toFixed(2)}`} />
+            )}
+          </div>
+        </Card>
+      )}
+
+      {hasLoadDetails && (
         <Card title="Load Details" className="route-info-section__card">
           <div className="route-info-section__rows">
-            {route.loadDetails.commodity && (
-              <InfoRow label="Commodity" value={route.loadDetails.commodity} />
+            {route.loadDetails!.commodity && (
+              <InfoRow label="Commodity" value={route.loadDetails!.commodity} />
             )}
-            {route.loadDetails.weight && (
+            {route.loadDetails!.weight && (
               <InfoRow
                 label="Weight"
-                value={`${route.loadDetails.weight} ${route.loadDetails.weightUnit ?? ''}`}
+                value={`${route.loadDetails!.weight} ${route.loadDetails!.weightUnit ?? ''}`}
               />
             )}
-            {route.loadDetails.unitCount != null && (
+            {route.loadDetails!.unitCount != null && (
               <InfoRow
                 label="Units"
-                value={`${route.loadDetails.unitCount} ${route.loadDetails.unitType ?? ''}`}
+                value={`${route.loadDetails!.unitCount} ${route.loadDetails!.unitType ?? ''}`}
               />
             )}
-            {route.loadDetails.capacity && (
-              <InfoRow label="Capacity" value={route.loadDetails.capacity} />
+            {route.loadDetails!.capacity && (
+              <InfoRow label="Capacity" value={route.loadDetails!.capacity} />
             )}
-            {route.loadDetails.lengthFeet && (
-              <InfoRow label="Length" value={route.loadDetails.lengthFeet} />
+            {route.loadDetails!.lengthFeet && (
+              <InfoRow label="Length" value={route.loadDetails!.lengthFeet} />
             )}
-            {route.loadDetails.temperature && (
-              <InfoRow label="Temperature" value={route.loadDetails.temperature} />
+            {route.loadDetails!.temperature && (
+              <InfoRow label="Temperature" value={`${route.loadDetails!.temperature}°`} />
             )}
           </div>
         </Card>
@@ -54,13 +107,24 @@ export function RouteInfoSection({ route }: RouteInfoSectionProps) {
 }
 
 function InfoRow({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = () => {
+    void copyToClipboard(value).then((ok) => {
+      if (ok) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      }
+    });
+  };
+
   return (
-    <div className="route-info-section__row">
+    <div className="route-info-section__row" onClick={handleCopy} style={{ cursor: 'pointer' }}>
       <Text as="span" size="sm" color="secondary">
         {label}
       </Text>
-      <Text as="span" size="sm" weight="medium">
-        {value}
+      <Text as="span" size="sm" weight="medium" color={copied ? 'success' : undefined}>
+        {copied ? 'Copied!' : value}
       </Text>
     </div>
   );

@@ -18,10 +18,8 @@ interface StopStatusBadgeProps {
 }
 
 export function StopStatusBadge({ status, className }: StopStatusBadgeProps) {
-  const config = statusConfig[status] || {
-    label: status || 'Unknown',
-    variant: 'default' as const,
-  };
+  const config = statusConfig[status];
+  if (!config) return null;
   return (
     <Badge variant={config.variant} className={className}>
       {config.label}

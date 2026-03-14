@@ -1,4 +1,4 @@
-import { useHistory } from 'react-router-dom';
+import { useIonRouter } from '@ionic/react';
 import { MapPin, ArrowRight, Truck } from 'lucide-react';
 import { ActionCard, Text } from '@/shared/ui';
 import { formatDate } from '@/shared/utils';
@@ -10,10 +10,10 @@ interface RouteCardProps {
 }
 
 export function RouteCard({ route }: RouteCardProps) {
-  const history = useHistory();
+  const router = useIonRouter();
 
   const handleClick = () => {
-    history.push(`/tabs/loads/${route.id}`);
+    router.push(`/tabs/loads/${route.id}`, 'forward', 'push');
   };
 
   return (
@@ -21,7 +21,7 @@ export function RouteCard({ route }: RouteCardProps) {
       <div className="route-card__header">
         <RouteStatusBadge status={route.status} />
         <Text size="xs" color="tertiary">
-          {route.internalIdentifier}
+          {route.brokerIdentifier || route.internalIdentifier}
         </Text>
       </div>
 
@@ -29,16 +29,20 @@ export function RouteCard({ route }: RouteCardProps) {
         <div className="route-card__city">
           <MapPin size={14} />
           <Text size="sm" weight="medium">
-            {route.originCity || 'TBD'}
+            {route.originCity || 'Origin pending'}
           </Text>
         </div>
-        <ArrowRight size={16} className="route-card__arrow" />
-        <div className="route-card__city">
-          <MapPin size={14} />
-          <Text size="sm" weight="medium">
-            {route.destinationCity || 'TBD'}
-          </Text>
-        </div>
+        {route.destinationCity && (
+          <>
+            <ArrowRight size={16} className="route-card__arrow" />
+            <div className="route-card__city">
+              <MapPin size={14} />
+              <Text size="sm" weight="medium">
+                {route.destinationCity}
+              </Text>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="route-card__details">
@@ -51,11 +55,17 @@ export function RouteCard({ route }: RouteCardProps) {
         <Text size="xs" color="secondary">
           {route.totalStops} stops
         </Text>
-        <Text size="xs" color="secondary">
-          {route.ratePerMile != null ? `$${route.ratePerMile.toFixed(2)}/mi` : '—'}
-        </Text>
+        {route.ratePerMile != null && (
+          <Text size="xs" color="secondary">
+            ${route.ratePerMile.toFixed(2)}/mi
+          </Text>
+        )}
         <Text size="xs" color="tertiary">
-          {route.originDate ? formatDate(route.originDate, 'MMM d') : '—'}
+          {route.originDate
+            ? formatDate(route.originDate, 'MMM d')
+            : route.bookedAt
+              ? formatDate(route.bookedAt, 'MMM d')
+              : null}
         </Text>
       </div>
     </ActionCard>

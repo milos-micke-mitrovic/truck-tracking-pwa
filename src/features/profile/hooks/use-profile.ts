@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAuthStore } from '@/shared/stores';
 import { profileApi } from '../api/profile.api';
 import type { DriverProfile, VehicleDetail, TrailerDetail } from '../types/profile.types';
@@ -10,33 +10,44 @@ export function useProfile() {
   const [trailer, setTrailer] = useState<TrailerDetail | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchedRef = useRef(false);
 
-  const fetchProfile = useCallback(async () => {
-    if (!user?.driverId) return;
+  const fetchProfile = useCallback(
+    async (force = false) => {
+      if (!user?.driverId) return;
+      if (!force && fetchedRef.current && driver) return;
 
-    setIsLoading(true);
-    setError(null);
+      fetchedRef.current = true;
+      setIsLoading(true);
+      setError(null);
 
-    try {
-      const driverData = await profileApi.getDriver(user.driverId);
-      setDriver(driverData);
+      try {
+        const driverData = await profileApi.getDriver(user.driverId);
+        setDriver(driverData);
 
-      if (user.vehicleId) {
-        const [vehicleData, trailerData] = await Promise.allSettled([
-          profileApi.getVehicle(user.vehicleId),
-          profileApi.getTrailerByVehicle(user.vehicleId),
-        ]);
+        if (user.vehicleId) {
+          const [vehicleData, trailerData] = await Promise.allSettled([
+            profileApi.getVehicle(user.vehicleId),
+            profileApi.getTrailerByVehicle(user.vehicleId),
+          ]);
 
-        if (vehicleData.status === 'fulfilled') setVehicle(vehicleData.value);
-        if (trailerData.status === 'fulfilled') setTrailer(trailerData.value);
+          if (vehicleData.status === 'fulfilled') setVehicle(vehicleData.value);
+          if (trailerData.status === 'fulfilled') setTrailer(trailerData.value);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Failed to load profile';
+        setError(message);
+        fetchedRef.current = false;
+      } finally {
+        setIsLoading(false);
       }
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to load profile';
-      setError(message);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [user?.driverId, user?.vehicleId]);
+    },
+    [user?.driverId, user?.vehicleId, driver]
+  );
+
+  const refresh = useCallback(async () => {
+    await fetchProfile(true);
+  }, [fetchProfile]);
 
   useEffect(() => {
     void fetchProfile();
@@ -48,6 +59,6 @@ export function useProfile() {
     trailer,
     isLoading,
     error,
-    refresh: fetchProfile,
+    refresh,
   };
 }

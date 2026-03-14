@@ -7,7 +7,9 @@ interface RoutesState {
   activeRoute: RouteResponse | null;
   isLoading: boolean;
   error: string | null;
+  routesFetchedAt: number | null;
   setRoutes: (routes: RouteShortResponse[]) => void;
+  appendRoutes: (newRoutes: RouteShortResponse[]) => void;
   addRoute: (route: RouteShortResponse) => void;
   setActiveRoute: (route: RouteResponse | null) => void;
   updateRouteInList: (id: number, updates: Partial<RouteShortResponse>) => void;
@@ -23,8 +25,16 @@ export const useRoutesStore = create<RoutesState>()(
       activeRoute: null,
       isLoading: false,
       error: null,
+      routesFetchedAt: null,
 
-      setRoutes: (routes) => set({ routes }),
+      setRoutes: (routes) => set({ routes, routesFetchedAt: Date.now() }),
+
+      appendRoutes: (newRoutes) =>
+        set((state) => {
+          const existingIds = new Set(state.routes.map((r) => r.id));
+          const unique = newRoutes.filter((r) => !existingIds.has(r.id));
+          return { routes: [...state.routes, ...unique] };
+        }),
 
       addRoute: (route) =>
         set((state) => ({

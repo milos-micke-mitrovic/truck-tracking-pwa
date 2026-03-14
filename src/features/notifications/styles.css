@@ -6,6 +6,15 @@
   gap: var(--spacing-md);
 }
 
+.notifications-list-page__error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-xl);
+  gap: var(--spacing-md);
+}
+
 .notifications-list-page__list {
   display: flex;
   flex-direction: column;

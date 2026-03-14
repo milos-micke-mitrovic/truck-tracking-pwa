@@ -6,6 +6,7 @@ import { useNotificationsStore } from '@/features/notifications/stores/use-notif
 import { sseService } from '@/shared/services/sse.service';
 import { registerPushNotifications } from '@/shared/services/push.service';
 import { routesApi } from '@/features/routes/api/routes.api';
+import { notificationsApi } from '@/features/notifications/api/notifications.api';
 import { RouteStatus, mapRouteResponseToShort } from '@/features/routes/types/route.types';
 import type { RouteResponse, SseEventPayload } from '@/features/routes/types/route.types';
 import type { NotificationResponse } from '@/features/notifications/types/notification.types';
@@ -37,6 +38,8 @@ export function useSSE() {
   const incrementUnreadCount = useNotificationsStore((state) => state.incrementUnreadCount);
   const addNotification = useNotificationsStore((state) => state.addNotification);
   const removeByReferenceId = useNotificationsStore((state) => state.removeByReferenceId);
+  const setNotifications = useNotificationsStore((state) => state.setNotifications);
+  const setUnreadCount = useNotificationsStore((state) => state.setUnreadCount);
 
   const [toast, setToast] = useState<SSEToast>({
     isOpen: false,
@@ -147,24 +150,26 @@ export function useSSE() {
     });
 
     // POD_APPROVED — refresh route so status updates to DELIVERED if all stops done
-    const unsubPodApproved = sseService.on('POD_APPROVED', async (raw) => {
-      const payload = raw as SseEventPayload;
-      addNotification(buildNotification(payload, ReferenceType.POD));
-      incrementUnreadCount();
-      showToast(payload, 'success');
+    const unsubPodApproved = sseService.on('POD_APPROVED', (raw) => {
+      void (async () => {
+        const payload = raw as SseEventPayload;
+        addNotification(buildNotification(payload, ReferenceType.POD));
+        incrementUnreadCount();
+        showToast(payload, 'success');
 
-      const routeId = payload.referenceId;
-      if (routeId) {
-        try {
-          const updatedRoute = await routesApi.getRoute(routeId);
-          updateRouteInList(updatedRoute.id, mapRouteResponseToShort(updatedRoute));
-          if (activeRoute?.id === updatedRoute.id) {
-            setActiveRoute(updatedRoute);
+        const routeId = payload.referenceId;
+        if (routeId) {
+          try {
+            const updatedRoute = await routesApi.getRoute(routeId);
+            updateRouteInList(updatedRoute.id, mapRouteResponseToShort(updatedRoute));
+            if (activeRoute?.id === updatedRoute.id) {
+              setActiveRoute(updatedRoute);
+            }
+          } catch {
+            // Silently ignore — notification was already shown
           }
-        } catch {
-          // Silently ignore — notification was already shown
         }
-      }
+      })();
     });
 
     // POD_REJECTED — include action to navigate to the route for resubmission
@@ -193,6 +198,21 @@ export function useSSE() {
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
         sseService.reconnect();
+
+        // Catch up on any notifications missed while the app was backgrounded
+        void (async () => {
+          try {
+            const driverId = user.driverId;
+            const [notifResponse, unreadResponse] = await Promise.all([
+              notificationsApi.getNotifications({ driverId, page: 0, size: 20 }),
+              notificationsApi.getUnreadCount(driverId),
+            ]);
+            setNotifications(notifResponse.content);
+            setUnreadCount(unreadResponse.count);
+          } catch {
+            // Silently ignore — SSE reconnect will still deliver future events
+          }
+        })();
       }
     };
     const handleOnline = () => {

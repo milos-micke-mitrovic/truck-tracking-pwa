@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import {
   IonTabs,
   IonTabBar,
@@ -13,6 +14,8 @@ import {
 } from '@ionic/react';
 import { Route, Redirect, useHistory } from 'react-router-dom';
 import { home, person, navigate, cube, cloudOfflineOutline } from 'ionicons/icons';
+import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
+import { RouteStatus } from '@/features/routes/types/route.types';
 import { HomePage } from '@/features/home/pages/HomePage';
 import { MapPage } from '@/features/map/pages/MapPage';
 import { ProfilePage } from '@/features/profile';
@@ -28,6 +31,30 @@ import { Toast } from '@/shared/ui';
 export function TabsLayout() {
   const { toast, dismissToast, routeAlert, dismissRouteAlert, isConnected } = useSSE();
   const history = useHistory();
+  const routes = useRoutesStore((state) => state.routes);
+
+  const activeStatuses: RouteStatus[] = [
+    RouteStatus.BOOKED,
+    RouteStatus.DISPATCHED,
+    RouteStatus.IN_TRANSIT,
+    RouteStatus.AT_PICKUP,
+    RouteStatus.LOADED,
+    RouteStatus.AT_DELIVERY,
+  ];
+  const activeLoadsCount = routes.filter((r) => activeStatuses.includes(r.status)).length;
+
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
+
+  useEffect(() => {
+    const goOnline = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, []);
 
   const handleMapClick = () => {
     history.push('/tabs/map');
@@ -35,6 +62,12 @@ export function TabsLayout() {
 
   return (
     <AuthGuard>
+      {!isOnline && (
+        <div className="offline-banner">
+          <IonIcon icon={cloudOfflineOutline} />
+          You're offline — showing cached data
+        </div>
+      )}
       <IonTabs>
         <IonRouterOutlet animation={iosTransitionAnimation}>
           <Route exact path="/tabs/home" component={HomePage} />
@@ -59,6 +92,7 @@ export function TabsLayout() {
           <IonTabButton tab="loads" href="/tabs/loads">
             <IonIcon icon={cube} />
             <IonLabel>Loads</IonLabel>
+            {activeLoadsCount > 0 && <span className="tab-badge">{activeLoadsCount}</span>}
           </IonTabButton>
 
           {/* Center spacer for FAB */}
@@ -139,9 +173,11 @@ export function TabsLayout() {
         isOpen={routeAlert.isOpen}
         header="New Route Assigned"
         message={routeAlert.message}
+        cssClass="route-assigned-alert"
         buttons={[
           {
             text: 'View Route',
+            cssClass: 'route-assigned-alert__view-btn',
             handler: () => {
               if (routeAlert.routeId) {
                 history.push(`/tabs/loads/${routeAlert.routeId}`);
