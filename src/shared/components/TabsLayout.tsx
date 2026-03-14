@@ -9,6 +9,7 @@ import {
   IonFab,
   IonFabButton,
   IonToast,
+  IonAlert,
   iosTransitionAnimation,
 } from '@ionic/react';
 import { Route, Redirect, useHistory } from 'react-router-dom';
@@ -167,33 +168,33 @@ export function TabsLayout() {
         />
       )}
 
-      {/* ROUTE_ASSIGNED alert — custom modal to avoid IonAlert watcher bug */}
-      {routeAlert.isOpen && (
-        <div className="route-assigned-alert__backdrop" onClick={dismissRouteAlert}>
-          <div className="route-assigned-alert__wrapper" onClick={(e) => e.stopPropagation()}>
-            <div className="route-assigned-alert__head">New Route Assigned</div>
-            <div className="route-assigned-alert__message">{routeAlert.message}</div>
-            <div className="route-assigned-alert__buttons">
-              <button
-                className="route-assigned-alert__view-btn"
-                onClick={() => {
-                  dismissRouteAlert();
-                  if (routeAlert.routeId) {
-                    history.push(`/tabs/loads/${routeAlert.routeId}`);
-                  } else {
-                    history.push('/tabs/loads');
-                  }
-                }}
-              >
-                View Route
-              </button>
-              <button className="route-assigned-alert__cancel-btn" onClick={dismissRouteAlert}>
-                Later
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ROUTE_ASSIGNED alert */}
+      <IonAlert
+        isOpen={routeAlert.isOpen}
+        header="New Route Assigned"
+        message={routeAlert.message}
+        cssClass="route-assigned-alert"
+        buttons={[
+          {
+            text: 'View Route',
+            cssClass: 'route-assigned-alert__view-btn',
+            handler: () => {
+              if (routeAlert.routeId) {
+                history.push(`/tabs/loads/${routeAlert.routeId}`);
+              } else {
+                history.push('/tabs/loads');
+              }
+              dismissRouteAlert();
+            },
+          },
+          {
+            text: 'Later',
+            role: 'cancel',
+            handler: dismissRouteAlert,
+          },
+        ]}
+        onDidDismiss={dismissRouteAlert}
+      />
     </AuthGuard>
   );
 }

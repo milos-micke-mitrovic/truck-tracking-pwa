@@ -48,6 +48,9 @@ export default defineConfig(({ mode }) => {
         },
       }),
     ],
+    optimizeDeps: {
+      include: ['@ionic/react', '@ionic/react-router', '@ionic/core'],
+    },
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
