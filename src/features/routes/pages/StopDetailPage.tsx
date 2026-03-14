@@ -28,13 +28,14 @@ const PICKUP_FLOW: StopStatus[] = [
   StopStatus.COMPLETED,
 ];
 
+// Delivery stops: driver goes up to DEPARTED, then submits POD.
+// COMPLETED is set automatically when dispatcher approves the POD.
 const DELIVERY_FLOW: StopStatus[] = [
   StopStatus.PENDING,
   StopStatus.EN_ROUTE,
   StopStatus.ARRIVED,
   StopStatus.UNLOADING,
   StopStatus.DEPARTED,
-  StopStatus.COMPLETED,
 ];
 
 const STATUS_LABELS: Record<string, string> = {
@@ -308,12 +309,14 @@ export function StopDetailPage() {
               </Button>
             )}
 
-            {isDelivery && (
-              <Button variant="outline" fullWidth onClick={handleSubmitPod}>
-                <Camera size={18} />
-                Submit POD
-              </Button>
-            )}
+            {isDelivery &&
+              stop.status !== StopStatus.COMPLETED &&
+              stop.status !== StopStatus.SKIPPED && (
+                <Button variant="outline" fullWidth onClick={handleSubmitPod}>
+                  <Camera size={18} />
+                  Submit POD
+                </Button>
+              )}
 
             {nextStatus && (
               <Button variant="solid" fullWidth onClick={handleStatusAction} disabled={isUpdating}>

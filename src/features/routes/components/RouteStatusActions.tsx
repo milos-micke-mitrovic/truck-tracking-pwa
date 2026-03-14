@@ -27,12 +27,10 @@ const statusTransitions: Partial<Record<RouteStatus, StatusTransition[]>> = {
     { label: 'Mark Loaded', nextStatus: RouteStatus.LOADED, variant: 'solid' },
   ],
   [RouteStatus.LOADED]: [{ label: 'Depart', nextStatus: RouteStatus.IN_TRANSIT, variant: 'solid' }],
-  [RouteStatus.AT_DELIVERY]: [
-    { label: 'Mark Delivered', nextStatus: RouteStatus.DELIVERED, variant: 'solid' },
-  ],
-  [RouteStatus.DELIVERED]: [
-    { label: 'Complete Route', nextStatus: RouteStatus.COMPLETED, variant: 'solid' },
-  ],
+  // AT_DELIVERY and DELIVERED/COMPLETED are handled automatically:
+  // - Driver submits POD → Dispatcher approves → Stop auto-completes
+  // - When all delivery stops complete → Route auto-transitions to DELIVERED
+  // - Dispatcher manually moves DELIVERED → COMPLETED → INVOICED → PAID
 };
 
 export function RouteStatusActions({ routeId, status }: RouteStatusActionsProps) {
