@@ -19,32 +19,22 @@ import { useRouteActions } from '../hooks/use-route-actions';
 import { StopType, StopStatus } from '../types/route.types';
 import type { RouteStopResponse } from '../types/route.types';
 
+// Pickup: En Route → Arrived → Departed
 const PICKUP_FLOW: StopStatus[] = [
   StopStatus.PENDING,
   StopStatus.EN_ROUTE,
   StopStatus.ARRIVED,
-  StopStatus.LOADING,
   StopStatus.DEPARTED,
-  StopStatus.COMPLETED,
 ];
 
-// Delivery stops: driver goes up to DEPARTED, then submits POD.
+// Delivery: En Route → Arrived → then driver submits POD
 // COMPLETED is set automatically when dispatcher approves the POD.
-const DELIVERY_FLOW: StopStatus[] = [
-  StopStatus.PENDING,
-  StopStatus.EN_ROUTE,
-  StopStatus.ARRIVED,
-  StopStatus.UNLOADING,
-  StopStatus.DEPARTED,
-];
+const DELIVERY_FLOW: StopStatus[] = [StopStatus.PENDING, StopStatus.EN_ROUTE, StopStatus.ARRIVED];
 
 const STATUS_LABELS: Record<string, string> = {
   [StopStatus.EN_ROUTE]: 'En Route',
   [StopStatus.ARRIVED]: 'Mark Arrived',
-  [StopStatus.LOADING]: 'Start Loading',
-  [StopStatus.UNLOADING]: 'Start Unloading',
   [StopStatus.DEPARTED]: 'Depart',
-  [StopStatus.COMPLETED]: 'Complete Stop',
 };
 
 function getNextStatus(

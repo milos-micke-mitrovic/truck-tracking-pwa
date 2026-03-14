@@ -15,22 +15,12 @@ interface StatusTransition {
   variant: 'solid' | 'outline';
 }
 
+// Simplified: driver only starts the route. Stop-level actions handle the rest.
+// DELIVERED/COMPLETED are set automatically via POD approval by dispatcher.
 const statusTransitions: Partial<Record<RouteStatus, StatusTransition[]>> = {
   [RouteStatus.DISPATCHED]: [
     { label: 'Start Route', nextStatus: RouteStatus.IN_TRANSIT, variant: 'solid' },
   ],
-  [RouteStatus.IN_TRANSIT]: [
-    { label: 'Arrive at Pickup', nextStatus: RouteStatus.AT_PICKUP, variant: 'solid' },
-    { label: 'Arrive at Delivery', nextStatus: RouteStatus.AT_DELIVERY, variant: 'solid' },
-  ],
-  [RouteStatus.AT_PICKUP]: [
-    { label: 'Mark Loaded', nextStatus: RouteStatus.LOADED, variant: 'solid' },
-  ],
-  [RouteStatus.LOADED]: [{ label: 'Depart', nextStatus: RouteStatus.IN_TRANSIT, variant: 'solid' }],
-  // AT_DELIVERY and DELIVERED/COMPLETED are handled automatically:
-  // - Driver submits POD → Dispatcher approves → Stop auto-completes
-  // - When all delivery stops complete → Route auto-transitions to DELIVERED
-  // - Dispatcher manually moves DELIVERED → COMPLETED → INVOICED → PAID
 };
 
 export function RouteStatusActions({ routeId, status }: RouteStatusActionsProps) {
