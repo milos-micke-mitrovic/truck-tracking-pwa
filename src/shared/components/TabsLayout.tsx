@@ -174,26 +174,17 @@ export function TabsLayout() {
         header="New Route Assigned"
         message={routeAlert.message}
         cssClass="route-assigned-alert"
-        buttons={[
-          {
-            text: 'View Route',
-            cssClass: 'route-assigned-alert__view-btn',
-            handler: () => {
-              if (routeAlert.routeId) {
-                history.push(`/tabs/loads/${routeAlert.routeId}`);
-              } else {
-                history.push('/tabs/loads');
-              }
-              dismissRouteAlert();
-            },
-          },
-          {
-            text: 'Later',
-            role: 'cancel',
-            handler: dismissRouteAlert,
-          },
-        ]}
-        onDidDismiss={dismissRouteAlert}
+        buttons={['View Route', { text: 'Later', role: 'cancel' }]}
+        onDidDismiss={(e) => {
+          dismissRouteAlert();
+          if (e.detail.role !== 'cancel' && e.detail.role !== 'backdrop') {
+            if (routeAlert.routeId) {
+              history.push(`/tabs/loads/${routeAlert.routeId}`);
+            } else {
+              history.push('/tabs/loads');
+            }
+          }
+        }}
       />
     </AuthGuard>
   );
