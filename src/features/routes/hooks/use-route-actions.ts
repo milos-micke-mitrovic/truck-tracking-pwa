@@ -41,7 +41,7 @@ export function useRouteActions() {
           ...(status === StopStatusEnum.ARRIVED
             ? { actualArrivalDate: new Date().toISOString() }
             : {}),
-          ...(status === StopStatusEnum.COMPLETED
+          ...(status === StopStatusEnum.DEPARTED || status === StopStatusEnum.COMPLETED
             ? { actualDepartureDate: new Date().toISOString() }
             : {}),
         });
