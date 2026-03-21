@@ -42,7 +42,7 @@ export function useProfile() {
         setIsLoading(false);
       }
     },
-    [user?.driverId, user?.vehicleId, driver]
+    [user?.driverId, user?.vehicleId]
   );
 
   const refresh = useCallback(async () => {

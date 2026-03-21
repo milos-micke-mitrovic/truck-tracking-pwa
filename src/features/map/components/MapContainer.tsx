@@ -68,14 +68,18 @@ function FollowModeHandler({
 
   // Auto-center when position changes in follow mode
   useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
     if (followMode) {
       isProgrammaticMove.current = true;
       map.setView([lat, lng], map.getZoom(), { animate: true });
       onCenteredChange(true);
-      setTimeout(() => {
+      timeoutId = setTimeout(() => {
         isProgrammaticMove.current = false;
       }, PROGRAMMATIC_MOVE_DELAY);
     }
+    return () => {
+      clearTimeout(timeoutId);
+    };
   }, [lat, lng, followMode, map, onCenteredChange, isProgrammaticMove]);
 
   return null;
@@ -126,6 +130,16 @@ export function MapContainer({ className, destination, onClearDestination }: Map
   const [isCentered, setIsCentered] = useState(false);
   const mapRef = useRef<L.Map | null>(null);
   const isProgrammaticMove = useRef(false);
+  const centerTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+  const followTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
+
+  // Clear timeouts on unmount
+  useEffect(() => {
+    return () => {
+      clearTimeout(centerTimeoutRef.current);
+      clearTimeout(followTimeoutRef.current);
+    };
+  }, []);
 
   const center: [number, number] = coordinates
     ? [coordinates.latitude, coordinates.longitude]
@@ -161,7 +175,8 @@ export function MapContainer({ className, destination, onClearDestination }: Map
         animate: true,
       });
       setIsCentered(true);
-      setTimeout(() => {
+      clearTimeout(centerTimeoutRef.current);
+      centerTimeoutRef.current = setTimeout(() => {
         isProgrammaticMove.current = false;
       }, PROGRAMMATIC_MOVE_DELAY);
     }
@@ -177,7 +192,8 @@ export function MapContainer({ className, destination, onClearDestination }: Map
         animate: true,
       });
       setIsCentered(true);
-      setTimeout(() => {
+      clearTimeout(followTimeoutRef.current);
+      followTimeoutRef.current = setTimeout(() => {
         isProgrammaticMove.current = false;
       }, PROGRAMMATIC_MOVE_DELAY);
     }
@@ -224,7 +240,7 @@ export function MapContainer({ className, destination, onClearDestination }: Map
         )}
         {!coordinates && (
           <Marker position={DEFAULT_CENTER} icon={driverIcon}>
-            <Popup>Current Location (Novi Sad)</Popup>
+            <Popup>Current Location</Popup>
           </Marker>
         )}
         {destination && (
@@ -251,6 +267,7 @@ export function MapContainer({ className, destination, onClearDestination }: Map
             size="small"
             onClick={onClearDestination}
             className="map-controls__button map-controls__button--danger"
+            aria-label="Clear destination"
           >
             <IonIcon icon={closeOutline} />
           </IonFabButton>
@@ -260,6 +277,7 @@ export function MapContainer({ className, destination, onClearDestination }: Map
             size="small"
             onClick={handleCenterLocation}
             className={cn('map-controls__button', isCentered && 'map-controls__button--primary')}
+            aria-label="Center on my location"
           >
             <IonIcon icon={locateOutline} />
           </IonFabButton>
@@ -268,6 +286,7 @@ export function MapContainer({ className, destination, onClearDestination }: Map
           size="small"
           onClick={handleToggleFollowMode}
           className={cn('map-controls__button', followMode && 'map-controls__button--active')}
+          aria-label="Toggle follow mode"
         >
           <IonIcon icon={navigateOutline} />
         </IonFabButton>

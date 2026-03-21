@@ -1,7 +1,12 @@
+import { useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { IonPage, IonContent, IonBackButton, IonButtons } from '@ionic/react';
 import { Header, Card, Skeleton, Button } from '@/shared/ui';
 import { NotificationBell } from '@/features/notifications/components/NotificationBell';
+import { useNotificationsStore } from '@/features/notifications/stores/use-notifications-store';
+import { notificationsApi } from '@/features/notifications/api/notifications.api';
+import { NotificationType } from '@/features/notifications/types/notification.types';
+import { useAuthStore } from '@/shared/stores/use-auth-store';
 import { useRouteDetail } from '../hooks/use-route-detail';
 import { RouteDetailHeader } from '../components/RouteDetailHeader';
 import { RouteStopTimeline } from '../components/RouteStopTimeline';
@@ -11,6 +16,24 @@ import { RouteInfoSection } from '../components/RouteInfoSection';
 export function RouteDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { route, isLoading, error, refresh } = useRouteDetail(id);
+  const user = useAuthStore((s) => s.user);
+  const { notifications, markAsRead } = useNotificationsStore();
+
+  // Auto-mark ROUTE_ASSIGNED notifications as read when viewing the route
+  useEffect(() => {
+    if (!route || !user) return;
+
+    const unreadAssigned = notifications.filter(
+      (n) => !n.read && n.type === NotificationType.ROUTE_ASSIGNED && n.referenceId === route.id
+    );
+
+    unreadAssigned.forEach((n) => {
+      markAsRead(n.id);
+      notificationsApi.markAsRead(n.id, user.driverId).catch(() => {
+        // Silently ignore — local state is already updated
+      });
+    });
+  }, [route, user, notifications, markAsRead]);
 
   return (
     <IonPage>

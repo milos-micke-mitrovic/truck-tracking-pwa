@@ -13,7 +13,7 @@ interface UseRoutesOptions {
 export function useRoutes(options: UseRoutesOptions = {}) {
   const { status } = options;
   const user = useAuthStore((state) => state.user);
-  const { routes, isLoading, error, routesFetchedAt, setRoutes, appendRoutes, setLoading, setError } =
+  const { routes, isLoading, error, setRoutes, appendRoutes, setLoading, setError } =
     useRoutesStore();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasMore, setHasMore] = useState(true);
@@ -22,6 +22,7 @@ export function useRoutes(options: UseRoutesOptions = {}) {
   const fetchRoutes = useCallback(
     async (force = false) => {
       if (!user?.driverId) return;
+      const routesFetchedAt = useRoutesStore.getState().routesFetchedAt;
       if (!force && routesFetchedAt && Date.now() - routesFetchedAt < STALE_MS) return;
 
       setLoading(true);
@@ -43,7 +44,7 @@ export function useRoutes(options: UseRoutesOptions = {}) {
         setLoading(false);
       }
     },
-    [user?.driverId, status, routesFetchedAt, setRoutes, setLoading, setError]
+    [user?.driverId, status, setRoutes, setLoading, setError]
   );
 
   const loadMore = useCallback(async () => {

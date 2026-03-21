@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { unregisterPushNotifications } from '@/shared/services/push.service';
+import { useRoutesStore } from '@/features/routes/stores/use-routes-store';
+import { useNotificationsStore } from '@/features/notifications/stores/use-notifications-store';
 
 export interface User {
   id: string;
@@ -52,6 +54,9 @@ export const useAuthStore = create<AuthState>()(
         })),
       logout: () => {
         void unregisterPushNotifications();
+        useRoutesStore.getState().setRoutes([]);
+        useRoutesStore.getState().setActiveRoute(null);
+        useNotificationsStore.getState().clearNotifications();
         set({
           user: null,
           token: null,

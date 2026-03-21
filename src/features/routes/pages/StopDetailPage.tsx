@@ -309,7 +309,13 @@ export function StopDetailPage() {
               )}
 
             {nextStatus && (
-              <Button variant="solid" fullWidth onClick={handleStatusAction} disabled={isUpdating}>
+              <Button
+                variant="solid"
+                fullWidth
+                onClick={handleStatusAction}
+                disabled={isUpdating}
+                loading={isUpdating}
+              >
                 {STATUS_LABELS[nextStatus]}
               </Button>
             )}
