@@ -15,7 +15,9 @@ export function PodSubmitPage() {
   const history = useHistory();
   const { submitPod, isLoading, error, uploadProgress } = usePodSubmit();
   const { takePhoto } = useCamera();
-  const { setActiveRoute, updateRouteInList } = useRoutesStore();
+  const { activeRoute, setActiveRoute, updateRouteInList } = useRoutesStore();
+  const stop = activeRoute?.stops.find((s) => String(s.id) === stopId);
+  const canSubmitPod = stop?.status === 'ARRIVED';
   const [photos, setPhotos] = useState<CameraPhoto[]>([]);
   const [notes, setNotes] = useState('');
   const [showLeaveAlert, setShowLeaveAlert] = useState(false);
@@ -96,6 +98,18 @@ export function PodSubmitPage() {
         rightContent={<NotificationBell />}
       />
       <IonContent>
+        {!canSubmitPod ? (
+          <div className="pod-submit-page">
+            <Card>
+              <Text color="secondary" align="center">
+                You must confirm arrival at the stop before submitting a Proof of Delivery.
+              </Text>
+            </Card>
+            <Button variant="outline" fullWidth onClick={() => history.goBack()}>
+              Go Back
+            </Button>
+          </div>
+        ) : (
         <div className="pod-submit-page">
           <Card title="Photos">
             <div className="pod-photo-gallery">
@@ -143,6 +157,7 @@ export function PodSubmitPage() {
               `Submit POD (${photos.length} photo${photos.length !== 1 ? 's' : ''})`}
           </Button>
         </div>
+        )}
       </IonContent>
 
       <Alert
