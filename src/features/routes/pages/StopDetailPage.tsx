@@ -199,6 +199,11 @@ export function StopDetailPage() {
   };
 
   const handleSubmitPod = () => {
+    if (stop.status !== StopStatus.ARRIVED) {
+      setToastMessage('Please confirm arrival at this stop before submitting a POD.');
+      setShowErrorToast(true);
+      return;
+    }
     router.push(`/tabs/loads/${routeId}/stops/${stopId}/pod`, 'forward', 'push');
   };
 
